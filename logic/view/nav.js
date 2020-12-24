@@ -34,11 +34,11 @@ function Nav()
       navContent += `<div class="nav-itemgroup">`;
       navContent += `<a href='#done-true' class="nav-item">`;
       navContent += `<div class="nav-itemcount">${value.done}</div>`;
-      navContent += `<i title="done" class="nav-itemicon ${main.util.getIcon('true')}"></i>`;
+      navContent += `<i title="done" class="nav-itemicon ${Icons['true']}"></i>`;
       navContent += `</a>`;
       navContent += `<a href='#done-false' class="nav-item">`;
       navContent += `<div class="nav-itemcount">${value.total - value.done}</div>`;
-      navContent += `<i title="to do" class="nav-itemicon ${main.util.getIcon('false')}"></i>`;
+      navContent += `<i title="to do" class="nav-itemicon ${Icons['false']}"></i>`;
       navContent += `</a>`;
       navContent += `</div>`;
     }
@@ -48,7 +48,7 @@ function Nav()
     {
       const type = value.types[ty][0];
       const count = value.types[ty][1];
-      const icon = main.util.getIcon(type);
+      const icon = Icons[type];
       navContent += `<a href='#type-${type}' class="nav-item">`;
       navContent += `<div class="nav-itemcount">${count}</div>`;
       navContent += `<i title="${type}" class="nav-itemicon ${icon}"></i>`;
