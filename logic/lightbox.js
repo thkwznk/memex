@@ -1,51 +1,38 @@
-function Lightbox()
-{
-  this.container = null;
-  this.img = null;
+class Lightbox {
+  constructor() {
+    this.container = null;
+    this.img = null;
+  }
 
-  this.install = function(container, prefix)
-  {
+  install(container, classNamePrefix) {
     this.container = container;
-    
-    let back = document.createElement('div');
-    back.className = prefix + '-back';
-    this.addEvent(back, 'click', function(){ lightbox.close(); });
+
+    let back = document.createElement("div");
+    back.className = `${classNamePrefix}-back`;
+    this.addEvent(back, "click", () => this.close());
     this.container.appendChild(back);
 
-    this.img = document.createElement('img');
-    this.img.className = prefix + '-img';
-    this.addEvent(this.img, 'click', function(){ lightbox.close(); });
+    this.img = document.createElement("img");
+    this.img.className = `${classNamePrefix}-img`;
+    this.addEvent(this.img, "click", () => this.close());
+
     this.container.appendChild(this.img);
   }
 
-  this.load = function(file)
-  {
-    this.img.src = file;
-  	this.container.style.display = 'block';
+  load(imageSrc) {
+    this.img.src = imageSrc;
+    this.container.style.display = "block";
   }
 
-  this.close = function()
-  {
-  	if (this.container.style.display != 'none')
-  	{
-  		this.container.style.display = 'none';
-  	}
+  close() {
+    this.container.style.display = "none";
   }
 
-  this.handle = function(element, file)
-  {
-    this.addEvent(element, 'click', function(){ lightbox.load(file); });
-  }
-
-  this.addEvent = function(element, evnt, funct)
-  {
-    if (element.attachEvent)
-    {
-      return element.attachEvent('on'+evnt, funct);
+  addEvent(element, eventName, func) {
+    if (element.attachEvent) {
+      return element.attachEvent("on" + eventName, func);
     }
-    else
-    {
-      return element.addEventListener(evnt, funct, false);
-    }
+
+    return element.addEventListener(eventName, func, false);
   }
 }
