@@ -34,7 +34,7 @@
   --size-grid-gutter: 20px;
   --size-grid-column: 350px;
 
-  --size-item-corner: 10px;
+  --size-item-corner: 2px;
   --size-item-elem-padding: 1em; /*vertical space between grid item internal elements (tags, notes, quotes etc)*/
   --size-item-elem-sep: 0.75em; /*horizontal space between item element icon and element text (tag icon and tags)*/
 
