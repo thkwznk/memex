@@ -8,11 +8,21 @@
   </head>
   <body>
     <script>
-      let theme = new Theme();
+      let theme = new Theme({
+        background: "#222",
+        f_high: "#eee",
+        f_med: "#ffee00",
+        f_low: "#999",
+        f_inv: "#fff",
+        b_high: "#888",
+        b_med: "#666",
+        b_low: "#111",
+        b_inv: "#000",
+      });
       theme.install();
       theme.start();
     </script>
-    
+
     <div class="loading-wave">
       <div></div>
       <div></div>
