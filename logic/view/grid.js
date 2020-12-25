@@ -1,11 +1,8 @@
-function Grid() {
-  this.container = null;
-  this.overlay = null;
-  this.columns = [];
-
-  this.install = function (container, overlay, numberOfColumns = 3) {
+class Grid {
+  constructor({ container, overlay, numberOfColumns = 3 }) {
     this.container = container;
     this.overlay = overlay;
+    this.columns = [];
 
     for (let i = 0; i < numberOfColumns; i++) {
       let column = document.createElement("div");
@@ -14,13 +11,13 @@ function Grid() {
       this.container.appendChild(column);
       this.columns.push(column);
     }
-  };
+  }
 
-  this.clear = function () {
+  clear() {
     for (let column of this.columns) column.innerHTML = "";
-  };
+  }
 
-  this.display = function (articles) {
+  display(articles) {
     this.clear();
 
     for (let i = 0; i < articles.length; i++) {
@@ -30,20 +27,20 @@ function Grid() {
     }
 
     seer.note("render html");
-  };
+  }
 
-  this.createElementFromHTML = function (htmlString) {
+  createElementFromHTML(htmlString) {
     var div = document.createElement("div");
     div.innerHTML = htmlString.trim();
 
     return div.firstChild;
-  };
+  }
 
-  this.buildAllArticles = function (db) {
+  buildAllArticles(db) {
     return Object.keys(db).map((dbKey) => this.buildArticle(db[dbKey], dbKey));
-  };
+  }
 
-  this.buildArticle = function (value, key) {
+  buildArticle(value, key) {
     let itemClass = "article";
 
     let isImageType =
@@ -139,7 +136,6 @@ function Grid() {
     // IMAGE - for image-type-article
     if (isImageType && value.FILE && main.util.isImage(value.FILE)) {
       // IMAGE ARTICLE
-
       article += `<div class="article-imageType-imgContainer">`;
       if (SETTINGS.SHOWOVERLAY) {
         article += `<div class="image-overlay" ${onclickImage}></div>`;
@@ -178,9 +174,9 @@ function Grid() {
 
     article += `</article>`;
     return article;
-  };
+  }
 
-  this.doLower = function (value, isImageType, onclickImage) {
+  doLower(value, isImageType, onclickImage) {
     let article = "";
     // LOWER CONTENT START
     if (SETTINGS.SHOWLOWER) {
@@ -242,9 +238,9 @@ function Grid() {
         main.util.isImage(value.FILE)
       ) {
         article += `
-          <div class="image">
-            <img class="article-img" src="content/media/${value.FILE}" onclick="lightbox.load('content/media/${value.FILE}')">
-          </div>`;
+        <div class="image">
+          <img class="article-img" src="content/media/${value.FILE}" onclick="lightbox.load('content/media/${value.FILE}')">
+        </div>`;
       }
 
       // FILE
@@ -272,17 +268,17 @@ function Grid() {
     }
 
     return article;
-  };
+  }
 
-  this.doRow = function (type, content, extraClass) {
+  doRow(type, content, extraClass) {
     return `
-      <div class="article-row ${extraClass}">
-        ${type != undefined ? main.util.buildIcon(type) : ""}
-        <div class="article-rowtext">${content}</div>
-      </div>`;
-  };
+    <div class="article-row ${extraClass}">
+      ${type != undefined ? main.util.buildIcon(type) : ""}
+      <div class="article-rowtext">${content}</div>
+    </div>`;
+  }
 
-  this.doRowArray = function (type, data, query, propercase) {
+  doRowArray(type, data, query, propercase) {
     let content = data
       .map(
         (value) =>
@@ -293,9 +289,9 @@ function Grid() {
       .join(", ");
 
     return this.doRow(type, content);
-  };
+  }
 
-  this.doRowMulti = function (type, data) {
+  doRowMulti(type, data) {
     if (!Array.isArray(data)) return this.doRow(type, data);
 
     let result = "";
@@ -342,9 +338,9 @@ function Grid() {
     }
 
     return result;
-  };
+  }
 
-  this.handleImageClick = function (e, element, file) {
+  handleImageClick(e, element, file) {
     e = e || window.event;
     var target = e.target || e.srcElement;
     if (target == element) {
@@ -353,5 +349,5 @@ function Grid() {
       // This stops lightbox from happening when clicking on tags, file etc
       lightbox.load(`content/media/${file}`);
     }
-  };
+  }
 }

@@ -17,12 +17,11 @@ class Main {
     this.util = new Util();
     this.wrap = new Wrap();
 
-    this.grid = new Grid();
-    this.grid.install(
-      document.querySelector("main"),
-      document.querySelector(".page-overlay"),
-      4
-    );
+    this.grid = new Grid({
+      container: document.querySelector("main"),
+      overlay: document.querySelector(".page-overlay"),
+      numberOfColumns: 4,
+    });
 
     this.nav = new Nav();
     this.nav.install(document.querySelector("nav"));
