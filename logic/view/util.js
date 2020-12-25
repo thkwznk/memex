@@ -10,18 +10,12 @@ class Util {
   }
 
   buildIcon(type, label, altClass) {
-    if (label == undefined) {
-      label = type;
-    }
+    label = label || type;
 
-    let labelElem = label != null ? `title="${label}" ` : ``;
+    let labelElem = label ? `title="${label}" ` : ``;
     let iconClass = altClass || "article-icon";
 
     return `<i ${labelElem}class="${Icons[type]} textIcon ${iconClass}"></i>`;
-  }
-
-  isDefined(value) {
-    return typeof value !== "undefined";
   }
 
   isObject(value) {
@@ -33,14 +27,7 @@ class Util {
   }
 
   isType(typeArray, value) {
-    if (this.isDefined(typeArray)) {
-      for (var i = 0; i < typeArray.length; i++) {
-        if (typeArray[i] == value) {
-          return true;
-        }
-      }
-    }
-    return false;
+    return typeArray && typeArray.some((t) => t === value);
   }
 
   // Source: https://stackoverflow.com/questions/8498592/extract-hostname-name-from-string

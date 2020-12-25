@@ -52,46 +52,44 @@ function Grid() {
   };
 
   this.buildAllArticles = function (db) {
-    let dbKeys = Object.keys(db);
-    let html = "";
-    for (var i = 0; i < dbKeys.length; i++) {
-      html += this.buildArticle(db[dbKeys[i]], dbKeys[i]);
+    let articles = new Array();
+
+    for (const key in db) {
+      articles.push(this.buildArticle(db[key], key));
     }
-    return html;
+
+    return articles.join("");
   };
 
   this.buildArticle = function (value, key) {
     let itemClass = "article";
+
     if (SETTINGS.WIDEARTICLE) {
-      if (main.util.isDefined(value.WIDE) && value.WIDE) {
+      let isWideQuote =
+        value.QOTE &&
+        Array.isArray(value.QOTE) &&
+        value.QOTE.length > SETTINGS.AUTOWIDETRIGGER;
+
+      if (value.WIDE || isWideQuote) {
         itemClass += " article-wide";
-      } else if (main.util.isDefined(value.QOTE)) {
-        if (
-          Array.isArray(value.QOTE) &&
-          value.QOTE.length > SETTINGS.AUTOWIDETRIGGER
-        ) {
-          itemClass += " article-wide";
-        }
       }
     }
 
-    let onclickImage = ``;
-    let articleIsImageType =
+    let isImageType =
       SETTINGS.SHOWIMAG && main.util.isType(value.TYPE, "image");
-    if (articleIsImageType) {
-      onclickImage = `onclick="main.grid.handleImageClick(event, this, '${value.FILE}');"`;
-    }
+
+    let onclickImage = isImageType
+      ? `onclick="main.grid.handleImageClick(event, this, '${value.FILE}');"`
+      : "";
 
     // ARTICLE
     let article = `<article class="${itemClass}" id="${
       SETTINGS.ARTICLEIDBASE + value.DIID
     }">`;
 
-    if (main.util.isDefined(value.LINK)) {
-      var idUrl = "url";
-      if (main.util.isDefined(value.SEEN) && value.SEEN === "true") {
-        idUrl = "urlseen";
-      }
+    if (value.LINK) {
+      let isUrlSeen = value.SEEN && value.SEEN === "true";
+      var idUrl = isUrlSeen ? "urlseen" : "url";
 
       // LINK START
       if (SETTINGS.SHOWLINK && !main.util.isObject(value.LINK)) {
@@ -104,10 +102,10 @@ function Grid() {
 
     // UPPER CONTENT START
     if (SETTINGS.SHOWUPPER) {
-      let upperClass = "article-containerupper";
-      if (articleIsImageType) {
-        upperClass = "article-containerupper-image";
-      }
+      let upperClass = isImageType
+        ? "article-containerupper-image"
+        : "article-containerupper";
+
       article += `<div class="${upperClass}" ${onclickImage}>`;
 
       // TITLE
@@ -116,7 +114,7 @@ function Grid() {
       }
 
       // LINK END
-      if (SETTINGS.SHOWLINK && main.util.isDefined(value.LINK)) {
+      if (SETTINGS.SHOWLINK && value.LINK) {
         if (main.util.isObject(value.LINK)) {
           for (let l = 0; l < value.LINK.length; l++) {
             article += `<a class="article-link" href="${String(
@@ -141,7 +139,7 @@ function Grid() {
       if (SETTINGS.SHOWTYPE || SETTINGS.SHOWDONE) {
         article += `<div class="article-typecontainer">`;
 
-        if (SETTINGS.SHOWTYPE && main.util.isDefined(value.TYPE)) {
+        if (SETTINGS.SHOWTYPE && value.TYPE) {
           for (let tc = 0; tc < value.TYPE.length; tc++) {
             article += `<a class="article-type" href='#type-${value.TYPE[tc]}'>`;
             article += main.util.buildIcon(
@@ -154,7 +152,7 @@ function Grid() {
         }
 
         if (SETTINGS.SHOWDONE) {
-          let done = main.util.isDefined(value.DONE) ? value.DONE : "false";
+          let done = value.DONE || "false";
           article += `<a class="article-type" href='#done-${done}'>`;
           article += main.util.buildIcon(done, done, "article-typeicon");
           article += `</a>`;
@@ -168,11 +166,7 @@ function Grid() {
     }
 
     // IMAGE - for image-type-article
-    if (
-      articleIsImageType &&
-      main.util.isDefined(value.FILE) &&
-      main.util.isImage(value.FILE)
-    ) {
+    if (isImageType && value.FILE && main.util.isImage(value.FILE)) {
       // IMAGE ARTICLE
 
       article += `<div class="article-imageType-imgContainer">`;
@@ -181,34 +175,34 @@ function Grid() {
       }
       article += `<img class="article-image-img" src="content/media/${value.FILE}">`;
 
-      article += this.doLower(value, articleIsImageType, onclickImage);
+      article += this.doLower(value, isImageType, onclickImage);
 
       article += `</div>`;
 
       article += `<div class="article-containerbelow">`;
       // TERM
-      if (SETTINGS.SHOWTERM && main.util.isDefined(value.TERM)) {
+      if (SETTINGS.SHOWTERM && value.TERM) {
         article += this.doRowMulti("term", value.TERM);
       }
 
       // NOTE
-      if (SETTINGS.SHOWNOTE && main.util.isDefined(value.NOTE)) {
+      if (SETTINGS.SHOWNOTE && value.NOTE) {
         article += this.doRowMulti("note", value.NOTE);
       }
 
       // QUOTE
-      if (SETTINGS.SHOWQOTE && main.util.isDefined(value.QOTE)) {
+      if (SETTINGS.SHOWQOTE && value.QOTE) {
         article += this.doRowMulti("quote", value.QOTE);
       }
 
       // PROGRESS
-      if (SETTINGS.SHOWPROG && main.util.isDefined(value.PROG)) {
+      if (SETTINGS.SHOWPROG && value.PROG) {
         article += this.doRowMulti("progress", value.PROG);
       }
       article += `</div>`;
     } else {
       // NORMAL ARTICLE (NON-IMAGE)
-      article += this.doLower(value, articleIsImageType, onclickImage);
+      article += this.doLower(value, isImageType, onclickImage);
     }
 
     article += `</article>`;
@@ -226,45 +220,45 @@ function Grid() {
       article += `<div class="${lowerClass}" ${onclickImage}>`;
 
       // TIME
-      if (SETTINGS.SHOWDATE && main.util.isDefined(value.DATE)) {
+      if (SETTINGS.SHOWDATE && value.DATE) {
         article += this.doRow("date", value.DATE);
       }
 
       // AUTHOR
-      if (SETTINGS.SHOWAUTH && main.util.isDefined(value.AUTH)) {
+      if (SETTINGS.SHOWAUTH && value.AUTH) {
         for (var i = 0; i < value.AUTH.length; i++) {
           article += this.doRow("author", value.AUTH[i].to_properCase());
         }
       }
 
       // TAGS
-      if (SETTINGS.SHOWTAGS && main.util.isDefined(value.TAGS)) {
+      if (SETTINGS.SHOWTAGS && value.TAGS) {
         article += this.doRowArray("tags", value.TAGS, "tag", false);
       }
 
       // PROJECT
-      if (SETTINGS.SHOWPROJ && main.util.isDefined(value.PROJ)) {
+      if (SETTINGS.SHOWPROJ && value.PROJ) {
         article += this.doRowArray("project", value.PROJ, "proj", true);
       }
 
       if (!articleIsImageType) {
         // TERM
-        if (SETTINGS.SHOWTERM && main.util.isDefined(value.TERM)) {
+        if (SETTINGS.SHOWTERM && value.TERM) {
           article += this.doRowMulti("term", value.TERM);
         }
 
         // NOTE
-        if (SETTINGS.SHOWNOTE && main.util.isDefined(value.NOTE)) {
+        if (SETTINGS.SHOWNOTE && value.NOTE) {
           article += this.doRowMulti("note", value.NOTE);
         }
 
         // QUOTE
-        if (SETTINGS.SHOWQOTE && main.util.isDefined(value.QOTE)) {
+        if (SETTINGS.SHOWQOTE && value.QOTE) {
           article += this.doRowMulti("quote", value.QOTE);
         }
 
         // PROGRESS
-        if (SETTINGS.SHOWPROG && main.util.isDefined(value.PROG)) {
+        if (SETTINGS.SHOWPROG && value.PROG) {
           article += this.doRowMulti("progress", value.PROG);
         }
       }
@@ -273,7 +267,7 @@ function Grid() {
       if (
         SETTINGS.SHOWIMAG &&
         !main.util.isType(value.TYPE, "image") &&
-        main.util.isDefined(value.FILE) &&
+        value.FILE &&
         main.util.isImage(value.FILE)
       ) {
         article += `<div class="image">`;
@@ -282,7 +276,7 @@ function Grid() {
       }
 
       // FILE
-      if (SETTINGS.SHOWFILE && main.util.isDefined(value.FILE)) {
+      if (SETTINGS.SHOWFILE && value.FILE) {
         if (main.util.isObject(value.FILE)) {
           for (var i = 0; i < value.FILE.length; i++) {
             article += this.doRow(
