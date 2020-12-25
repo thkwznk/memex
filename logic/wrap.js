@@ -134,82 +134,90 @@ class Wrap {
 
   stats(db) {
     // CALCULATE
-    let dbKeys = Object.keys(db);
-    var stats = {
-      total: dbKeys.length,
-      types: {},
-      tags: {},
-      terms: 0,
-      done: 0,
-    };
+    var stats = new Stats();
 
     for (const dbKey in db) {
-      let type = db[dbKey].TYPE;
-      let tags = db[dbKey].TAGS;
-      let term = db[dbKey].TERM;
-      let done = db[dbKey].DONE;
-
-      if (type) {
-        if (stats.types[type]) {
-          stats.types[type]++;
-        } else {
-          stats.types[type] = 1;
-        }
-      }
-
-      if (tags) {
-        for (var t = 0; t < tags.length; t++) {
-          let tag = tags[t];
-
-          if (stats.tags[tag]) {
-            stats.tags[tag]++;
-          } else {
-            stats.tags[tag] = 1;
-          }
-        }
-      }
-
-      if (term) {
-        let count = 0;
-
-        for (var t = 0; t < term.length; t++) {
-          if (term[t].substr(0, 2) === "> ") {
-            count++;
-          }
-        }
-
-        stats.terms += count;
-      }
-
-      if (done && done === "true") {
-        stats.done++;
-      }
+      stats.incrementTotal();
+      stats.incrementType(db[dbKey].TYPE);
+      stats.incrementTags(db[dbKey].TAGS);
+      stats.incrementTerm(db[dbKey].TERM);
+      stats.incrementDone(db[dbKey].DONE);
     }
 
+    return stats;
+  }
+}
+
+class Stats {
+  constructor() {
+    this.total = 0;
+    this._types = {};
+    this._tags = {};
+    this.terms = 0;
+    this.done = 0;
+  }
+
+  incrementTotal() {
+    this.total++;
+  }
+
+  incrementType(type) {
+    if (!type) return;
+
+    if (this._types[type]) this._types[type]++;
+    else this._types[type] = 1;
+  }
+
+  incrementTags(tags) {
+    if (!tags) return;
+
+    for (let tag of tags) {
+      if (this._tags[tag]) this._tags[tag]++;
+      else this._tags[tag] = 1;
+    }
+  }
+
+  incrementTerm(term) {
+    if (!term) return;
+
+    let count = 0;
+
+    for (let t of term) if (t.substr(0, 2) === "> ") count++;
+
+    this.terms += count;
+  }
+
+  incrementDone(done) {
+    if (!done || done !== "true") return;
+
+    this.done++;
+  }
+
+  getSortedTypes(count) {
     // SORT TYPES, TAKE TOP X
     // Create items array
-    var typeItems = Object.keys(stats.types).map(function (key) {
-      return [key, stats.types[key]];
-    });
+    var typeItems = Object.keys(this._types).map((type) => ({
+      name: type,
+      count: this._types[type],
+    }));
 
-    // Sort the array based on the second element
-    typeItems.sort(function (first, second) {
-      return second[1] - first[1];
-    });
-    stats.types = typeItems;
+    // Sort the array based on the type's count
+    typeItems.sort((first, second) => second.count - first.count);
 
+    return typeItems.slice(0, count);
+  }
+
+  getSortedTags(count) {
     // SORT TAGS, TAKE TOP X
     // Create items array
-    var tagItems = Object.keys(stats.tags).map(function (key) {
-      return [key, stats.tags[key]];
-    });
+    var tagItems = Object.keys(this._tags).map((tag) => ({
+      name: tag,
+      count: this._tags[tag],
+    }));
 
-    // Sort the array based on the second element
-    tagItems.sort(function (first, second) {
-      return second[1] - first[1];
-    });
-    stats.tags = tagItems;
+    // Sort the array based on the tag's count
+    tagItems.sort((first, second) => second.count - first.count);
 
-    return stats;
+    return tagItems.slice(0, count);
   }
 }
