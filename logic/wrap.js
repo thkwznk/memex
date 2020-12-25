@@ -39,11 +39,9 @@ class Wrap {
   }
 
   filter(target, db) {
-    if (target === "") return db;
+    if (!target) return db;
 
     let tempDatabase = {};
-
-    let keys = Object.keys(db);
 
     if (target === "term") {
       for (const key in db) {
@@ -53,78 +51,71 @@ class Wrap {
           tempDatabase[key] = db[key];
         }
       }
-    } else {
-      var splitTarget = target.split("-");
 
-      if (splitTarget[0] == "tag") {
-        // TAG
-        let tagRequest = decodeURI(splitTarget[1]);
-        for (let i = 0; i < keys.length; i++) {
-          let value = db[keys[i]];
-          if (typeof value.TAGS !== "undefined") {
-            for (let t = 0; t < value.TAGS.length; t++) {
-              if (value.TAGS[t] == tagRequest) {
-                tempDatabase[keys[i]] = db[keys[i]];
-              }
-            }
+      return tempDatabase;
+    }
+
+    var splitTarget = target.split("-");
+    let targetType = splitTarget[0];
+    let targetName = decodeURI(splitTarget[1]);
+
+    if (targetType == "tag") {
+      // TAG
+      for (const dbKey in db) {
+        const tags = db[dbKey].TAGS;
+
+        if (!tags) continue;
+
+        for (const tag of tags) {
+          if (tag === targetName) {
+            tempDatabase[dbKey] = db[dbKey];
           }
         }
       }
+    }
 
-      if (splitTarget[0] == "proj") {
-        // PROJECT
-        let projectRequest = decodeURI(splitTarget[1]);
-        for (let i = 0; i < keys.length; i++) {
-          let value = db[keys[i]];
-          if (typeof value.PROJ !== "undefined") {
-            for (let p = 0; p < value.PROJ.length; p++) {
-              if (value.PROJ[p] == projectRequest) {
-                tempDatabase[keys[i]] = db[keys[i]];
-              }
-            }
+    if (targetType == "proj") {
+      // PROJECT
+      for (const dbKey in db) {
+        const projects = db[dbKey].PROJ;
+
+        if (!projects) continue;
+
+        for (const project of projects) {
+          if (project === targetName) {
+            tempDatabase[dbKey] = db[dbKey];
           }
         }
-      } else if (splitTarget[0] == "type") {
-        // TYPE
-        let typeRequest = decodeURI(splitTarget[1]);
-        for (let i = 0; i < keys.length; i++) {
-          let value = db[keys[i]];
-          if (typeof value.TYPE !== "undefined") {
-            if (typeof value.TYPE == "object") {
-              // This entry has multiple types
-              for (let t = 0; t < value.TYPE.length; t++) {
-                if (value.TYPE[t] == typeRequest) {
-                  tempDatabase[keys[i]] = db[keys[i]];
-                }
-              }
-            } else {
-              // This entry has a single type
-              if (value.TYPE == typeRequest) {
-                tempDatabase[keys[i]] = db[keys[i]];
-              }
-            }
+      }
+    }
+
+    if (targetType === "type") {
+      // TYPE
+      for (const dbKey in db) {
+        let types = db[dbKey].TYPE;
+
+        if (!types) continue;
+
+        types = Array.isArray(types) ? types : [types];
+
+        for (const type of types) {
+          if (type === targetName) {
+            tempDatabase[dbKey] = db[dbKey];
           }
         }
-      } else if (splitTarget[0] == "done") {
-        // DONE
-        let doneValue = decodeURI(splitTarget[1]);
-        for (let i = 0; i < keys.length; i++) {
-          let value = db[keys[i]];
-          if (doneValue == "true") {
-            // true
-            if (typeof value.DONE !== "undefined") {
-              if (value.DONE == "true") {
-                tempDatabase[keys[i]] = db[keys[i]];
-              }
-            }
-          } else {
-            // false
-            if (typeof value.DONE === "undefined") {
-              tempDatabase[keys[i]] = db[keys[i]];
-            } else if (value.DONE == "false") {
-              tempDatabase[keys[i]] = db[keys[i]];
-            }
-          }
+      }
+    }
+
+    if (targetType == "done") {
+      // DONE
+      for (const dbKey in db) {
+        const done = db[dbKey].DONE;
+
+        if (
+          (targetName === "true" && done === "true") ||
+          (targetName !== "true" && done !== "true")
+        ) {
+          tempDatabase[dbKey] = db[dbKey];
         }
       }
     }
@@ -145,79 +136,5 @@ class Wrap {
     }
 
     return stats;
-  }
-}
-
-class Stats {
-  constructor() {
-    this.total = 0;
-    this._types = {};
-    this._tags = {};
-    this.terms = 0;
-    this.done = 0;
-  }
-
-  incrementTotal() {
-    this.total++;
-  }
-
-  incrementType(type) {
-    if (!type) return;
-
-    if (this._types[type]) this._types[type]++;
-    else this._types[type] = 1;
-  }
-
-  incrementTags(tags) {
-    if (!tags) return;
-
-    for (let tag of tags) {
-      if (this._tags[tag]) this._tags[tag]++;
-      else this._tags[tag] = 1;
-    }
-  }
-
-  incrementTerm(term) {
-    if (!term) return;
-
-    let count = 0;
-
-    for (let t of term) if (t.substr(0, 2) === "> ") count++;
-
-    this.terms += count;
-  }
-
-  incrementDone(done) {
-    if (!done || done !== "true") return;
-
-    this.done++;
-  }
-
-  getSortedTypes(count) {
-    // SORT TYPES, TAKE TOP X
-    // Create items array
-    var typeItems = Object.keys(this._types).map((type) => ({
-      name: type,
-      count: this._types[type],
-    }));
-
-    // Sort the array based on the type's count
-    typeItems.sort((first, second) => second.count - first.count);
-
-    return typeItems.slice(0, count);
-  }
-
-  getSortedTags(count) {
-    // SORT TAGS, TAKE TOP X
-    // Create items array
-    var tagItems = Object.keys(this._tags).map((tag) => ({
-      name: tag,
-      count: this._tags[tag],
-    }));
-
-    // Sort the array based on the tag's count
-    tagItems.sort((first, second) => second.count - first.count);
-
-    return tagItems.slice(0, count);
   }
 }
