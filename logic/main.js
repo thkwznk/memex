@@ -1,16 +1,11 @@
 class Main {
   constructor() {
-    this.wrap = null;
     this.articles = null;
-    this.grid = null;
-    this.nav = null;
     this.add = null;
     this.write = null;
 
     this.articlesDisplayed = 0;
-  }
 
-  install() {
     seer.note("load all js files");
 
     this.wrap = new Wrap();
