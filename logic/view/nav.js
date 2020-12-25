@@ -1,35 +1,37 @@
-function Nav() {
-  this.container = null;
+class Nav {
+  constructor() {
+    this.container = null;
+  }
 
-  this.install = function (container) {
+  install(container) {
     this.container = container;
-  };
+  }
 
-  this.display = function (value) {
+  display(value) {
     let navContent = ``;
 
     // TOTAL
-    navContent += `<div class="nav-itemgroup">`;
-    navContent += `<a href='#' class="nav-item">`;
-    navContent += `<div class="nav-itemcount">${value.total}</div>`;
-    navContent += `<i title="all" class="nav-itemicon fas fa-asterisk"></i>`;
-    navContent += `</a>`;
-    navContent += `</div>`;
+    navContent += `
+      <div class="nav-itemgroup">
+        <a href='#' class="nav-item">
+          <div class="nav-itemcount">${value.total}</div>
+          <i title="all" class="nav-itemicon fas fa-asterisk"></i>
+        </a>
+      </div>`;
 
     // DONE
     if (SETTINGS.SHOWDONE) {
-      navContent += `<div class="nav-itemgroup">`;
-      navContent += `<a href='#done-true' class="nav-item">`;
-      navContent += `<div class="nav-itemcount">${value.done}</div>`;
-      navContent += `<i title="done" class="nav-itemicon ${Icons["true"]}"></i>`;
-      navContent += `</a>`;
-      navContent += `<a href='#done-false' class="nav-item">`;
-      navContent += `<div class="nav-itemcount">${
-        value.total - value.done
-      }</div>`;
-      navContent += `<i title="to do" class="nav-itemicon ${Icons["false"]}"></i>`;
-      navContent += `</a>`;
-      navContent += `</div>`;
+      navContent += `
+        <div class="nav-itemgroup">
+          <a href='#done-true' class="nav-item">
+            <div class="nav-itemcount">${value.done}</div>
+            <i title="done" class="nav-itemicon ${Icons["true"]}"></i>
+          </a>
+          <a href='#done-false' class="nav-item">
+            <div class="nav-itemcount">${value.total - value.done}</div>
+            <i title="to do" class="nav-itemicon ${Icons["false"]}"></i>
+          </a>
+        </div>`;
     }
 
     navContent += `<div class="nav-itemgroup">`;
@@ -76,6 +78,7 @@ function Nav() {
       navContent += `</div>`;
     }
     navContent += `</div>`;
+
     this.container.innerHTML = navContent;
-  };
+  }
 }
