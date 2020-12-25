@@ -46,7 +46,7 @@ class Wrap {
     let keys = Object.keys(db);
 
     if (target === "term") {
-      for (const key in keys) {
+      for (const key in db) {
         let value = db[key];
 
         if (value.TERM) {
