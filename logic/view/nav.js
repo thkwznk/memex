@@ -1,9 +1,5 @@
 class Nav {
-  constructor() {
-    this.container = null;
-  }
-
-  install(container) {
+  constructor({ container }) {
     this.container = container;
   }
 

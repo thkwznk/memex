@@ -23,8 +23,9 @@ class Main {
       numberOfColumns: 4,
     });
 
-    this.nav = new Nav();
-    this.nav.install(document.querySelector("nav"));
+    this.nav = new Nav({
+      container: document.querySelector("nav"),
+    });
 
     seer.note("install main");
   }
@@ -35,6 +36,7 @@ class Main {
 
     let stats = this.wrap.stats(this.articles);
     seer.note("calc stats");
+    
     this.nav.display(stats);
     seer.note("render stats");
 
@@ -66,7 +68,7 @@ class Main {
     seer.note("filter db");
 
     let delay = 0;
-    
+
     if (
       filteredLength > SETTINGS.LOADANIMNUM ||
       this.articlesDisplayed > SETTINGS.LOADANIMNUM
