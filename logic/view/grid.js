@@ -27,29 +27,9 @@ function Grid() {
   this.display = function (html) {
     this.container.innerHTML = html;
     seer.note("render html");
-
-    // LAYOUT
-    if (SETTINGS.USEMASONRY) {
-      this.msnry.reloadItems();
-      this.msnry.layout();
-
-      if (SETTINGS.MASONRYCOMPLETE || SETTINGS.MASONRYPROGRESS) {
-        let imgLoad = imagesLoaded(this.container);
-        if (!SETTINGS.MASONRYPROGRESS) {
-          // When all images finish: redo mansonry layout
-          imgLoad.on("always", function () {
-            parent.msnry.layout();
-          });
-        } else {
-          // As images load one by one: redo masonry layout
-          imgLoad.on("progress", function () {
-            parent.msnry.layout();
-          });
-        }
-      }
-      seer.note("masonry layout");
-    }
   };
+
+
 
   this.buildAllArticles = function (db) {
     let articles = new Array();
@@ -63,17 +43,6 @@ function Grid() {
 
   this.buildArticle = function (value, key) {
     let itemClass = "article";
-
-    if (SETTINGS.WIDEARTICLE) {
-      let isWideQuote =
-        value.QOTE &&
-        Array.isArray(value.QOTE) &&
-        value.QOTE.length > SETTINGS.AUTOWIDETRIGGER;
-
-      if (value.WIDE || isWideQuote) {
-        itemClass += " article-wide";
-      }
-    }
 
     let isImageType =
       SETTINGS.SHOWIMAG && main.util.isType(value.TYPE, "image");

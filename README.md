@@ -56,8 +56,6 @@ Stored in a human-readable, flat-file database called [Indental](https://wiki.xx
 |     LOADANIMNUM | threshold number of articles in query/displayed to trigger loading animation to display             |
 |     WIDEARTICLE | allow wide entries (`WIDE : true`)                                                                  |
 | AUTOWIDETRIGGER | automatically wide entry if it has more QOTE entries than this number                               |
-|      USEMASONRY | enable [masonry](https://masonry.desandro.com/) layout library usage                                |
-| MASONRYPROGRESS | masonry re-layout as images load (true), or only once all images complete (false)                   |
 |   ARTICLEIDBASE | CSS name prefix                                                                                     |
 |       SHOWUPPER | toggle display of upper entry element(s)                                                            |
 |       SHOWTITLE | toggle display of entry title                                                                       |
@@ -80,7 +78,6 @@ Stored in a human-readable, flat-file database called [Indental](https://wiki.xx
 
 - Database parser: [Indental](https://wiki.xxiivv.com/#indental)
 - Theming: [Themes](https://github.com/hundredrabbits/Themes)
-- Grid layout: [Masonry](https://masonry.desandro.com/)
 - Icons: [Font Awesome](https://fontawesome.com/)
 
 ### Thanks
