@@ -1,10 +1,5 @@
 class Lightbox {
-  constructor() {
-    this.container = null;
-    this.img = null;
-  }
-
-  install(container, classNamePrefix) {
+  constructor({ container, classNamePrefix }) {
     this.container = container;
 
     let back = document.createElement("div");

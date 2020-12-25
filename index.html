@@ -73,8 +73,10 @@
         document.querySelector(".error").style.display = "inline-block";
       };
 
-      let lightbox = new Lightbox();
-      lightbox.install(document.querySelector(".lightbox"), "lightbox");
+      let lightbox = new Lightbox({
+        container: document.querySelector(".lightbox"),
+        classNamePrefix: "lightbox",
+      });
 
       var main = new Main();
       main.install();
