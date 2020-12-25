@@ -8,9 +8,6 @@ class Main {
     this.add = null;
     this.write = null;
 
-    this.queryCur = "";
-    this.queryPrev = "";
-    this.queryPrevAdd = "";
     this.articlesDisplayed = 0;
   }
 
@@ -24,8 +21,7 @@ class Main {
     this.grid.install(
       document.querySelector("main"),
       document.querySelector(".page-overlay"),
-      "main",
-      "article"
+      4
     );
 
     this.nav = new Nav();
@@ -53,24 +49,25 @@ class Main {
 
     // UPDATE QUERY
     let target = window.document.location.hash;
-    if (this.queryCur !== "add") {
-      this.queryPrev = this.queryCur;
-    }
+
     target =
       target.substr(0, 1) === "#"
         ? target.substr(1, target.length - 1)
         : target;
-    this.queryCur = target.trim();
-    if (window.location.hash != this.queryCur) {
-      window.location.hash = this.queryCur;
+
+    let queryCurrent = target.trim();
+
+    if (window.location.hash != queryCurrent) {
+      window.location.hash = queryCurrent;
     }
 
     // DISPLAY
-    let filtered = this.wrap.filter(this.queryCur, this.articles);
+    let filtered = this.wrap.filter(queryCurrent, this.articles);
     let filteredLength = Object.keys(filtered).length;
     seer.note("filter db");
 
     let delay = 0;
+    
     if (
       filteredLength > SETTINGS.LOADANIMNUM ||
       this.articlesDisplayed > SETTINGS.LOADANIMNUM
@@ -86,10 +83,11 @@ class Main {
   }
 
   build(filtered) {
-    let html = main.grid.buildAllArticles(filtered);
+    let articles = this.grid.buildAllArticles(filtered);
+
     seer.note("build html");
 
-    main.grid.display(html);
+    this.grid.display(articles);
     seer.report();
 
     document.querySelector(".loading-wave").style.display = "none";

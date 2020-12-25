@@ -264,6 +264,13 @@ nav::-webkit-scrollbar {
 }
 main {
   margin: var(--size-grid-gutter) auto;
+  display: flex;
+}
+main > * {
+  margin-right: 20px;
+}
+main:last-child {
+  margin-right: 0;
 }
 main:after {
   /* clearfix (reset) */
@@ -278,7 +285,6 @@ main:after {
   border-radius: var(--size-item-corner);
   margin-bottom: var(--size-grid-gutter);
   background: var(--color-itembg);
-  width: var(--size-grid-column);
   text-decoration: none;
   position: relative;
   float: left;
@@ -721,4 +727,11 @@ article:hover .textIcon {
 .page-overlay .content-enter a {
   color: var(--color-page-e);
   text-decoration: none;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 20%;
 }

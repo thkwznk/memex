@@ -1,44 +1,47 @@
 function Grid() {
   this.container = null;
   this.overlay = null;
+  this.columns = [];
 
-  this.msnry = null;
-  var parent = this;
-
-  this.install = function (container, overlay, elemContainer, elemItem) {
+  this.install = function (container, overlay, numberOfColumns = 3) {
     this.container = container;
     this.overlay = overlay;
 
-    if (SETTINGS.USEMASONRY) {
-      this.msnry = new Masonry(elemContainer, {
-        itemSelector: elemItem,
-        columnWidth: 350,
-        gutter: 20,
-        fitWidth: true,
-        transitionDuration: 0,
-      });
+    for (let i = 0; i < numberOfColumns; i++) {
+      let column = document.createElement("div");
+      column.className = "column";
+
+      this.container.appendChild(column);
+      this.columns.push(column);
     }
   };
 
   this.clear = function () {
-    this.container.innerHTML = "";
+    for (let column of this.columns) column.innerHTML = "";
   };
 
-  this.display = function (html) {
-    this.container.innerHTML = html;
+  this.display = function (articles) {
+    this.clear();
+
+    for (let i = 0; i < articles.length; i++) {
+      this.columns[i % this.columns.length].appendChild(
+        this.createElementFromHTML(articles[i])
+      );
+    }
+
     seer.note("render html");
   };
 
+  this.createElementFromHTML = function (htmlString) {
+    var div = document.createElement("div");
+    div.innerHTML = htmlString.trim();
 
+    // Change this to div.childNodes to support multiple top-level nodes
+    return div.firstChild;
+  };
 
   this.buildAllArticles = function (db) {
-    let articles = new Array();
-
-    for (const key in db) {
-      articles.push(this.buildArticle(db[key], key));
-    }
-
-    return articles.join("");
+    return Object.keys(db).map((dbKey) => this.buildArticle(db[dbKey], dbKey));
   };
 
   this.buildArticle = function (value, key) {
