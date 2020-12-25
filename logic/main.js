@@ -1,6 +1,5 @@
 class Main {
   constructor() {
-    this.util = null;
     this.wrap = null;
     this.articles = null;
     this.grid = null;
@@ -14,7 +13,6 @@ class Main {
   install() {
     seer.note("load all js files");
 
-    this.util = new Util();
     this.wrap = new Wrap();
 
     this.grid = new Grid({
@@ -36,7 +34,7 @@ class Main {
 
     let stats = this.wrap.stats(this.articles);
     seer.note("calc stats");
-    
+
     this.nav.display(stats);
     seer.note("render stats");
 

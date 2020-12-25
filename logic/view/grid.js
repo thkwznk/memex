@@ -1,5 +1,6 @@
 class Grid {
   constructor({ container, overlay, numberOfColumns = 3 }) {
+    this.util = new Util();
     this.container = container;
     this.overlay = overlay;
     this.columns = [];
@@ -44,7 +45,7 @@ class Grid {
     let itemClass = "article";
 
     let isImageType =
-      SETTINGS.SHOWIMAG && main.util.isType(value.TYPE, "image");
+      SETTINGS.SHOWIMAG && this.util.isType(value.TYPE, "image");
 
     let onclickImage = isImageType
       ? `onclick="main.grid.handleImageClick(event, this, '${value.FILE}');"`
@@ -60,7 +61,7 @@ class Grid {
       var idUrl = isUrlSeen ? "urlseen" : "url";
 
       // LINK START
-      if (SETTINGS.SHOWLINK && !main.util.isObject(value.LINK)) {
+      if (SETTINGS.SHOWLINK && !this.util.isObject(value.LINK)) {
         // If this item has only one link then make the whole title the link
         article += `<a class="article-link" href="${String(
           value.LINK
@@ -83,21 +84,21 @@ class Grid {
 
       // LINK END
       if (SETTINGS.SHOWLINK && value.LINK) {
-        if (main.util.isObject(value.LINK)) {
+        if (this.util.isObject(value.LINK)) {
           for (let l = 0; l < value.LINK.length; l++) {
             article += `<a class="article-link" href="${String(
               value.LINK[l]
             )}" id="${idUrl}">`;
-            article += `<div class="article-linkcontainer"><div class="article-linkicon">${main.util.buildIcon(
+            article += `<div class="article-linkcontainer"><div class="article-linkicon">${this.util.buildIcon(
               "link"
-            )}</div><div class="article-linktitle">${main.util.extractRootDomain(
+            )}</div><div class="article-linktitle">${this.util.extractRootDomain(
               value.LINK[l]
             )}</div></div></a>`;
           }
         } else {
-          article += `<div class="article-linkcontainer"><div class="article-linkicon">${main.util.buildIcon(
+          article += `<div class="article-linkcontainer"><div class="article-linkicon">${this.util.buildIcon(
             "link"
-          )}</div><div class="article-linktitle">${main.util.extractRootDomain(
+          )}</div><div class="article-linktitle">${this.util.extractRootDomain(
             value.LINK
           )}</div></div></a>`;
         }
@@ -110,7 +111,7 @@ class Grid {
         if (SETTINGS.SHOWTYPE && value.TYPE) {
           for (let tc = 0; tc < value.TYPE.length; tc++) {
             article += `<a class="article-type" href='#type-${value.TYPE[tc]}'>`;
-            article += main.util.buildIcon(
+            article += this.util.buildIcon(
               value.TYPE[tc],
               value.TYPE[tc],
               "article-typeicon"
@@ -122,7 +123,7 @@ class Grid {
         if (SETTINGS.SHOWDONE) {
           let done = value.DONE || "false";
           article += `<a class="article-type" href='#done-${done}'>`;
-          article += main.util.buildIcon(done, done, "article-typeicon");
+          article += this.util.buildIcon(done, done, "article-typeicon");
           article += `</a>`;
         }
 
@@ -134,7 +135,7 @@ class Grid {
     }
 
     // IMAGE - for image-type-article
-    if (isImageType && value.FILE && main.util.isImage(value.FILE)) {
+    if (isImageType && value.FILE && this.util.isImage(value.FILE)) {
       // IMAGE ARTICLE
       article += `<div class="article-imageType-imgContainer">`;
       if (SETTINGS.SHOWOVERLAY) {
@@ -233,9 +234,9 @@ class Grid {
       // IMAGE - for non-image-type-article
       if (
         SETTINGS.SHOWIMAG &&
-        !main.util.isType(value.TYPE, "image") &&
+        !this.util.isType(value.TYPE, "image") &&
         value.FILE &&
-        main.util.isImage(value.FILE)
+        this.util.isImage(value.FILE)
       ) {
         article += `
         <div class="image">
@@ -245,7 +246,7 @@ class Grid {
 
       // FILE
       if (SETTINGS.SHOWFILE && value.FILE) {
-        if (main.util.isObject(value.FILE)) {
+        if (this.util.isObject(value.FILE)) {
           for (var i = 0; i < value.FILE.length; i++) {
             article += this.doRow(
               "file",
@@ -273,7 +274,7 @@ class Grid {
   doRow(type, content, extraClass) {
     return `
     <div class="article-row ${extraClass}">
-      ${type != undefined ? main.util.buildIcon(type) : ""}
+      ${type != undefined ? this.util.buildIcon(type) : ""}
       <div class="article-rowtext">${content}</div>
     </div>`;
   }
