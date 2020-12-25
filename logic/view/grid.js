@@ -36,7 +36,6 @@ function Grid() {
     var div = document.createElement("div");
     div.innerHTML = htmlString.trim();
 
-    // Change this to div.childNodes to support multiple top-level nodes
     return div.firstChild;
   };
 
@@ -181,14 +180,14 @@ function Grid() {
     return article;
   };
 
-  this.doLower = function (value, articleIsImageType, onclickImage) {
+  this.doLower = function (value, isImageType, onclickImage) {
     let article = "";
     // LOWER CONTENT START
     if (SETTINGS.SHOWLOWER) {
-      let lowerClass = "article-containerlower";
-      if (articleIsImageType) {
-        lowerClass = "article-containerlower-image";
-      }
+      let lowerClass = isImageType
+        ? "article-containerlower-image"
+        : "article-containerlower";
+
       article += `<div class="${lowerClass}" ${onclickImage}>`;
 
       // TIME
@@ -198,9 +197,9 @@ function Grid() {
 
       // AUTHOR
       if (SETTINGS.SHOWAUTH && value.AUTH) {
-        for (var i = 0; i < value.AUTH.length; i++) {
-          article += this.doRow("author", value.AUTH[i].to_properCase());
-        }
+        article += value.AUTH.map((author) =>
+          this.doRow("author", author.to_properCase())
+        ).join("");
       }
 
       // TAGS
@@ -213,7 +212,7 @@ function Grid() {
         article += this.doRowArray("project", value.PROJ, "proj", true);
       }
 
-      if (!articleIsImageType) {
+      if (!isImageType) {
         // TERM
         if (SETTINGS.SHOWTERM && value.TERM) {
           article += this.doRowMulti("term", value.TERM);
@@ -242,9 +241,10 @@ function Grid() {
         value.FILE &&
         main.util.isImage(value.FILE)
       ) {
-        article += `<div class="image">`;
-        article += `<img class="article-img" src="content/media/${value.FILE}" onclick="lightbox.load('content/media/${value.FILE}')">`;
-        article += `</div>`;
+        article += `
+          <div class="image">
+            <img class="article-img" src="content/media/${value.FILE}" onclick="lightbox.load('content/media/${value.FILE}')">
+          </div>`;
       }
 
       // FILE
@@ -270,64 +270,77 @@ function Grid() {
       // LOWER CONTENT END
       article += `</div>`;
     }
+
     return article;
   };
 
   this.doRow = function (type, content, extraClass) {
-    return `<div class="article-row${
-      extraClass != undefined ? " " + extraClass : ""
-    }">
-      ${type != undefined ? main.util.buildIcon(type) : ""}
-      <div class="article-rowtext">${content}</div>
+    return `
+      <div class="article-row ${extraClass}">
+        ${type != undefined ? main.util.buildIcon(type) : ""}
+        <div class="article-rowtext">${content}</div>
       </div>`;
   };
 
   this.doRowArray = function (type, data, query, propercase) {
-    let content = "";
-    for (var i = 0; i < data.length; i++) {
-      content += `<a class="article-taglink" href="#${query}-${data[i]}">${
-        propercase == true ? data[i].to_properCase() : data[i]
-      }</a>`;
-      if (i + 1 !== data.length) {
-        content += `, `;
-      }
-    }
+    let content = data
+      .map(
+        (value) =>
+          `<a class="article-taglink" href="#${query}-${value}">${
+            propercase ? value.to_properCase() : value
+          }</a>`
+      )
+      .join(", ");
+
     return this.doRow(type, content);
   };
 
   this.doRowMulti = function (type, data) {
+    if (!Array.isArray(data)) return this.doRow(type, data);
+
     let result = "";
-    if (Array.isArray(data)) {
-      for (var i in data) {
-        if (data[i].substring(0, 2) == "> ") {
-          // New item
-          if (data[i].includes(": ")) {
-            let titleSplit = data[i].substring(2).split(": "); // .substring(2) removes the "> "
-            for (var e = 0; e < titleSplit.length; e++) {
-              titleSplit[e] = titleSplit[e].trim();
+
+    for (var value of data) {
+      let prefix = value.substring(0, 2);
+
+      switch (prefix) {
+        // New item
+        case "> ":
+          {
+            if (value.includes(": ")) {
+              let titleSplit = value.substring(2).split(": "); // .substring(2) removes the "> "
+
+              for (var e = 0; e < titleSplit.length; e++) {
+                titleSplit[e] = titleSplit[e].trim();
+              }
+
+              result += this.doRow(
+                type,
+                `<b>${titleSplit[0]}</b>: ${titleSplit[1]}`
+              );
+            } else {
+              result += this.doRow(type, value.substring(2));
             }
-            result += this.doRow(
-              type,
-              `<b>${titleSplit[0]}</b>: ${titleSplit[1]}`
-            );
-          } else {
-            result += this.doRow(type, data[i].substring(2));
           }
-        } else if (data[i].substring(0, 2) === "& ") {
-          // New line in current item
-          result += this.doRow(null, data[i].substring(2));
-        } else if (data[i].substring(0, 2) == "- ") {
-          // Bullet point
-          result += this.doRow("dash", data[i].substring(2));
-        } else {
-          // Handle unformatted
-          result += this.doRow(type, data[i]);
-        }
+          break;
+
+        // New line in current item
+        case "& ":
+          result += this.doRow(null, value.substring(2));
+          break;
+
+        // Bullet point
+        case "- ":
+          result += this.doRow("dash", value.substring(2));
+          break;
+
+        // Handle unformatted
+        default:
+          result += this.doRow(type, value);
+          break;
       }
-    } else {
-      // Handle not array
-      result += this.doRow(type, data);
     }
+
     return result;
   };
 
