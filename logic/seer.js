@@ -1,22 +1,24 @@
 "use strict";
-function Seer()
-{
-  this.verbose = false
-  this.quota = 0;
-  this.limbo = false;
-  
-  this.timeBegin = null;
-  this.timeRef = null;
-  this.book = null;
 
-  this.install = function(verbose, quota)
+class Seer {
+  constructor() {
+    this.verbose = false
+    this.quota = 0;
+    this.limbo = false;
+    
+    this.timeBegin = null;
+    this.timeRef = null;
+    this.book = null;
+  }
+
+  install(verbose, quota)
   {
     this.verbose = verbose;
     this.quota = quota;
   	this.rebirth();
   }
 
-  this.rebirth = function()
+  rebirth()
   {
     this.timeBegin = Date.now();
     this.timeRef = Date.now();
@@ -24,7 +26,7 @@ function Seer()
     this.limbo = false;
   }
 
-  this.note = function(desc)
+  note(desc)
   {
     if (this.limbo)
     {
@@ -40,7 +42,7 @@ function Seer()
     this.timeRef = Date.now();
   }
 
-  this.report = function()
+  report()
   {
     let total = (Date.now() - this.timeBegin);
     console.log('Completed in: ' + total + ' ms');
