@@ -1,108 +1,101 @@
-function Main()
-{
-  this.util = null;
-  this.wrap = null;
-  this.articles = null;
-  this.grid = null;
-  this.nav = null;
-  this.add = null;
-  this.write = null;
+class Main {
+  constructor() {
+    this.util = null;
+    this.wrap = null;
+    this.articles = null;
+    this.grid = null;
+    this.nav = null;
+    this.add = null;
+    this.write = null;
 
-  this.queryCur = '';
-  this.queryPrev = '';
-  this.queryPrevAdd = '';
-  this.articlesDisplayed = 0;
-  var parent = this;
+    this.queryCur = "";
+    this.queryPrev = "";
+    this.queryPrevAdd = "";
+    this.articlesDisplayed = 0;
+  }
 
-  this.install = function()
-  {
-    seer.note('load all js files');
+  install() {
+    seer.note("load all js files");
 
     this.util = new Util();
     this.wrap = new Wrap();
+
     this.grid = new Grid();
     this.grid.install(
-      document.querySelector('main'),
-      document.querySelector('.page-overlay'),
-      'main',
-      'article');
+      document.querySelector("main"),
+      document.querySelector(".page-overlay"),
+      "main",
+      "article"
+    );
+
     this.nav = new Nav();
-    this.nav.install(document.querySelector('nav'));
+    this.nav.install(document.querySelector("nav"));
 
-    if (window.showAdd !== undefined && window.showAdd)
-    {
-      this.add = new Add();
-      this.add.install();
-      // var escape = document.getElementById("escape");
-      // escape.onclick = function()
-      // {
-      //   main.add.close();
-      // }
-    }
-
-    seer.note('install main');
+    seer.note("install main");
   }
 
-  this.start = function()
-  {
+  start() {
     this.articles = this.wrap.start(DATABASE);
-    seer.note('process db');
+    seer.note("process db");
 
     let stats = this.wrap.stats(this.articles);
-    seer.note('calc stats');
+    seer.note("calc stats");
     this.nav.display(stats);
-    seer.note('render stats');
+    seer.note("render stats");
 
     this.load();
   }
 
-  this.load = function()
-  {
+  load() {
     // RESET
     lightbox.close();
     document.activeElement.blur();
 
     // UPDATE QUERY
     let target = window.document.location.hash;
-    if (this.queryCur !== 'add')
-    {
+    if (this.queryCur !== "add") {
       this.queryPrev = this.queryCur;
     }
-    target = target.substr(0,1) === "#" ? target.substr(1,target.length-1) : target;
+    target =
+      target.substr(0, 1) === "#"
+        ? target.substr(1, target.length - 1)
+        : target;
     this.queryCur = target.trim();
-    if (window.location.hash != this.queryCur)
-    {
+    if (window.location.hash != this.queryCur) {
       window.location.hash = this.queryCur;
     }
 
     // DISPLAY
-    let filtered = main.wrap.filter(main.queryCur, main.articles);
+    let filtered = this.wrap.filter(this.queryCur, this.articles);
     let filteredLength = Object.keys(filtered).length;
-    seer.note('filter db');
-    
+    seer.note("filter db");
+
     let delay = 0;
-    if (filteredLength > SETTINGS.LOADANIMNUM || this.articlesDisplayed > SETTINGS.LOADANIMNUM)
-    {
+    if (
+      filteredLength > SETTINGS.LOADANIMNUM ||
+      this.articlesDisplayed > SETTINGS.LOADANIMNUM
+    ) {
       // adding or removing a large number of articles can take time, so show loader
       this.grid.clear();
-      document.querySelector('.loading-wave').style.display = 'inline-block';
+      document.querySelector(".loading-wave").style.display = "inline-block";
       delay = 10; // Small delay gives the preloader time to display
     }
     this.articlesDisplayed = filteredLength;
 
-    setTimeout(function() { main.build(filtered) }, delay);
+    setTimeout(() => this.build(filtered), delay);
   }
 
-  this.build = function(filtered)
-  {
-    let html = main.grid.buildAllArticles(filtered)
-    seer.note('build html');
+  build(filtered) {
+    let html = main.grid.buildAllArticles(filtered);
+    seer.note("build html");
 
     main.grid.display(html);
     seer.report();
 
-    document.querySelector('.loading-wave').style.display = 'none';
+    document.querySelector(".loading-wave").style.display = "none";
   }
 }
 
-window.addEventListener("hashchange", function() { main.load(); });
+window.addEventListener("hashchange", function () {
+  main.load();
+});
