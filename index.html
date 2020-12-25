@@ -42,8 +42,10 @@
 
     <script src="logic/seer.js"></script>
     <script>
-      var seer = new Seer();
-      seer.install(false, 1);
+      var seer = new Seer({
+        verbose: false,
+        quota: 1,
+      });
     </script>
 
     <div class="error"></div>
