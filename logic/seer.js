@@ -1,14 +1,14 @@
 "use strict";
 
 class Seer {
-  constructor({ verbose, quota = 0 }) {
+  constructor({ verbose, quota = 1 }) {
     this.verbose = verbose;
     this.quota = quota;
-    this.limbo = false;
 
     this.timeBegin = null;
     this.timeRef = null;
     this.book = null;
+    this.limbo = false;
 
     this.rebirth();
   }
@@ -20,29 +20,30 @@ class Seer {
     this.limbo = false;
   }
 
-  note(desc) {
+  note(description) {
     if (this.limbo) this.rebirth();
 
-    var entry = [desc, Date.now() - this.timeRef];
+    var entry = { description, duration: Date.now() - this.timeRef };
     this.book.push(entry);
-    if (this.verbose) {
-      console.log(entry[1] + " ms to " + entry[0]);
-    }
+
+    if (this.verbose)
+      console.log(`${entry.duration} ms to ${entry.description}`);
+
     this.timeRef = Date.now();
   }
 
   report() {
     let total = Date.now() - this.timeBegin;
-    console.log("Completed in: " + total + " ms");
-    if (this.quota > 0) {
-      this.book.sort(function (a, b) {
-        return a[1] + b[1];
-      });
-      for (var i = 0; i < Math.min(this.quota, this.book.length); i++) {
-        let percentage = ((this.book[i][1] / total) * 100).toFixed(1);
-        console.log(percentage + " % of time spent on: " + this.book[i][0]);
-      }
+    console.log(`Completed in: ${total} ms`);
+
+    this.book.sort((a, b) => b.duration - a.duration);
+
+    for (var i = 0; i < Math.min(this.quota, this.book.length); i++) {
+      let entry = this.book[i];
+      let percentage = ((entry.duration / total) * 100).toFixed(1);
+      console.log(`${percentage} % (${entry.duration} ms) of time spent on: ${entry.description}`);
     }
+
     console.log("_____________________________");
     this.limbo = true;
   }
