@@ -30,8 +30,14 @@ const Row = ({ className, type }, ...children) =>
     "div",
     { className: `article-row ${className}` },
     type && Icon(type),
-    createElement("div", { className: "article-rowtext" }, children)
+    createElement("div", { className: "article-rowtext" }, ...children)
   );
+
+const Anchor = (options, ...children) =>
+  createElement("a", options, ...children);
+
+const Container = (options, ...children) =>
+  createElement("div", options, ...children);
 
 class Grid {
   constructor({ container, overlay, numberOfColumns = 3 }) {
@@ -94,13 +100,12 @@ class Grid {
 
   doImageArticle(value) {
     return [
-      createElement(
-        "div",
+      Container(
         {
           className: "article-imageType-imgContainer",
         },
         SETTINGS.SHOWOVERLAY &&
-          createElement("div", {
+          Container({
             className: "image-overlay",
             onclick: this.handleOnClick(value.FILE),
           }),
@@ -110,11 +115,7 @@ class Grid {
         }),
         this.doLower(value, true)
       ),
-      createElement(
-        "div",
-        { className: "article-containerbelow" },
-        this.doBelow(value)
-      ),
+      Container({ className: "article-containerbelow" }, this.doBelow(value)),
     ];
   }
 
@@ -126,8 +127,7 @@ class Grid {
     let idUrl = value.SEEN && value.SEEN === "true" ? "urlseen" : "url";
 
     const Header = () =>
-      createElement(
-        "div",
+      Container(
         {
           className,
           onclick,
@@ -140,22 +140,16 @@ class Grid {
         SETTINGS.SHOWLINK &&
           value.LINK &&
           links.map((link) =>
-            createElement(
-              "a",
+            Anchor(
               {
                 className: "article-link",
                 href: String(link),
                 id: idUrl,
               },
-              createElement(
-                "div",
+              Container(
                 { className: "article-linkcontainer" },
-                createElement(
-                  "div",
-                  { className: "article-linkicon" },
-                  Icon("link")
-                ),
-                createElement("div", {
+                Container({ className: "article-linkicon" }, Icon("link")),
+                Container({
                   className: "article-linktitle",
                   innerText: new URL(link).hostname,
                 })
@@ -163,21 +157,18 @@ class Grid {
             )
           ),
         (SETTINGS.SHOWTYPE || SETTINGS.SHOWDONE) &&
-          createElement(
-            "div",
+          Container(
             { className: "article-typecontainer" },
             SETTINGS.SHOWTYPE &&
               value.TYPE &&
               value.TYPE.map((type) =>
-                createElement(
-                  "a",
+                Anchor(
                   { className: "article-type", href: `#type-${type}` },
                   Icon(type, type, "article-typeicon")
                 )
               ),
             SETTINGS.SHOWDONE &&
-              createElement(
-                "a",
+              Anchor(
                 { className: "article-type", href: `#done-${done}` },
                 Icon(done, done, "article-typeicon")
               )
@@ -186,8 +177,7 @@ class Grid {
 
     // If this item has only one link then make the whole title the link
     return hasSingleLink
-      ? createElement(
-          "a",
+      ? Anchor(
           {
             className: "article-link",
             href: String(value.LINK),
@@ -203,8 +193,7 @@ class Grid {
 
     let files = Array.isArray(value.FILE) ? value.FILE : [value.FILE];
 
-    return createElement(
-      "div",
+    return Container(
       {
         className: isImageType
           ? "article-containerlower-image"
@@ -229,8 +218,7 @@ class Grid {
         !Util.isType(value.TYPE, "image") &&
         value.FILE &&
         Util.isImage(value.FILE) &&
-        createElement(
-          "div",
+        Container(
           { className: "image" },
           createElement("img", {
             className: "article-img",
@@ -243,8 +231,7 @@ class Grid {
         files.map((file) =>
           Row(
             { type: "file", className: "article-file" },
-            createElement(
-              "a",
+            Anchor(
               {
                 className: "article-file-link",
                 href: `content/media/${file}`,
@@ -270,7 +257,7 @@ class Grid {
   doRowArray(type, data, query, propercase) {
     let values = data
       .map((value) => [
-        createElement("a", {
+        Anchor({
           className: "article-taglink",
           href: `#${query}-${value}`,
           innerText: propercase ? Util.toProperCase(value) : value,
