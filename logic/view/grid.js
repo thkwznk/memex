@@ -33,6 +33,39 @@ const Row = ({ className, type }, ...children) =>
     createElement("div", { className: "article-rowtext" }, ...children)
   );
 
+const MultilineRow = ({ type, values }) =>
+  Array.isArray(values)
+    ? values.map((value) => MultilineRowLine(type, value))
+    : Row({ type }, values);
+
+function MultilineRowLine(type, value) {
+  let prefix = value.substring(0, 2);
+
+  // New item
+  if (prefix === "> ") {
+    if (value.includes(": ")) {
+      let titleSplit = value.substring(2).split(": "); // .substring(2) removes the "> "
+
+      return Row(
+        { type },
+        createElement("b", {}, titleSplit[0].trim()),
+        `: ${titleSplit[1].trim()}`
+      );
+    }
+
+    return Row({ type }, value.substring(2));
+  }
+
+  // New line in current item
+  if (prefix === "& ") return Row({ type: null }, value.substring(2));
+
+  // Bullet point
+  if (prefix === "- ") return Row({ type: "dash" }, value.substring(2));
+
+  // Handle unformatted
+  return Row({ type }, value);
+}
+
 const Anchor = (options, ...children) =>
   createElement("a", options, ...children);
 
@@ -245,12 +278,18 @@ class Grid {
 
   doBelow(value) {
     return [
-      SETTINGS.SHOWTERM && value.TERM && this.doRowMulti("term", value.TERM),
-      SETTINGS.SHOWNOTE && value.NOTE && this.doRowMulti("note", value.NOTE),
-      SETTINGS.SHOWQOTE && value.QOTE && this.doRowMulti("quote", value.QOTE),
+      SETTINGS.SHOWTERM &&
+        value.TERM &&
+        MultilineRow({ type: "term", values: value.TERM }),
+      SETTINGS.SHOWNOTE &&
+        value.NOTE &&
+        MultilineRow({ type: "note", values: value.NOTE }),
+      SETTINGS.SHOWQOTE &&
+        value.QOTE &&
+        MultilineRow({ type: "quote", values: value.QOTE }),
       SETTINGS.SHOWPROG &&
         value.PROG &&
-        this.doRowMulti("progress", value.PROG),
+        MultilineRow({ type: "progress", values: value.PROG }),
     ];
   }
 
@@ -269,40 +308,6 @@ class Grid {
     values.pop(); // Remove the last comma
 
     return Row({ type }, values);
-  }
-
-  doRowMulti(type, data) {
-    if (!Array.isArray(data)) return Row({ type }, data);
-
-    return data.map((entry) => this.doRowMultiEntry(type, entry));
-  }
-
-  doRowMultiEntry(type, value) {
-    let prefix = value.substring(0, 2);
-
-    // New item
-    if (prefix === "> ") {
-      if (value.includes(": ")) {
-        let titleSplit = value.substring(2).split(": "); // .substring(2) removes the "> "
-
-        return Row(
-          { type },
-          createElement("b", {}, titleSplit[0].trim()),
-          `: ${titleSplit[1].trim()}`
-        );
-      }
-
-      return Row({ type }, value.substring(2));
-    }
-
-    // New line in current item
-    if (prefix === "& ") return Row({ type: null }, value.substring(2));
-
-    // Bullet point
-    if (prefix === "- ") return Row({ type: "dash" }, value.substring(2));
-
-    // Handle unformatted
-    return Row({ type }, value);
   }
 
   handleOnClick(file) {
