@@ -35,7 +35,6 @@ const Row = ({ className, type }, ...children) =>
 
 class Grid {
   constructor({ container, overlay, numberOfColumns = 3 }) {
-    this.util = new Util();
     this.container = container;
     this.overlay = overlay;
     this.columns = [];
@@ -68,9 +67,9 @@ class Grid {
   buildArticle(key, value) {
     let isImageType =
       SETTINGS.SHOWIMAG &&
-      this.util.isType(value.TYPE, "image") &&
+      Util.isType(value.TYPE, "image") &&
       value.FILE &&
-      this.util.isImage(value.FILE);
+      Util.isImage(value.FILE);
 
     return createElement(
       "article",
@@ -136,7 +135,7 @@ class Grid {
         SETTINGS.SHOWTITLE &&
           createElement("header", {
             className: "article-title",
-            innerText: key.to_properCase(),
+            innerText: Util.toProperCase(key),
           }),
         SETTINGS.SHOWLINK &&
           value.LINK &&
@@ -158,7 +157,7 @@ class Grid {
                 ),
                 createElement("div", {
                   className: "article-linktitle",
-                  innerText: this.util.extractRootDomain(link),
+                  innerText: new URL(link).hostname,
                 })
               )
             )
@@ -216,7 +215,7 @@ class Grid {
       SETTINGS.SHOWAUTH &&
         value.AUTH &&
         value.AUTH.map((author) =>
-          Row({ type: "author" }, author.to_properCase())
+          Row({ type: "author" }, Util.toProperCase(author))
         ),
       SETTINGS.SHOWTAGS &&
         value.TAGS &&
@@ -227,9 +226,9 @@ class Grid {
       !isImageType && this.doBelow(value),
       // IMAGE - for non-image-type-article
       SETTINGS.SHOWIMAG &&
-        !this.util.isType(value.TYPE, "image") &&
+        !Util.isType(value.TYPE, "image") &&
         value.FILE &&
-        this.util.isImage(value.FILE) &&
+        Util.isImage(value.FILE) &&
         createElement(
           "div",
           { className: "image" },
@@ -274,7 +273,7 @@ class Grid {
         createElement("a", {
           className: "article-taglink",
           href: `#${query}-${value}`,
-          innerText: propercase ? value.to_properCase() : value,
+          innerText: propercase ? Util.toProperCase(value) : value,
         }),
         ", ",
       ])
