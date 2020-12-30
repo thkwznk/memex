@@ -1,23 +1,23 @@
 class Wrap {
-  start(data) {
-    this.commaSplit = function (data) {
-      if (!data) return data;
+  commaSplit(data) {
+    if (!data) return data;
 
-      return data.split(",").map((dataEntry) => dataEntry.trim().toLowerCase());
-    };
+    return data.split(",").map((dataEntry) => dataEntry.trim().toLowerCase());
+  }
 
-    this.objectSplit = function (data) {
-      if (typeof data === "object") {
-        for (let o = 0; o < data.length; o++) {
-          if (data[o].substr(0, 2) == "> ") {
-            data[o] = data[o].substr(2, data[o].length - 1);
-          }
+  objectSplit(data) {
+    if (Array.isArray(data)) {
+      for (let o = 0; o < data.length; o++) {
+        if (data[o].startsWith("> ")) {
+          data[o] = data[o].substr(2);
         }
       }
+    }
 
-      return data;
-    };
+    return data;
+  }
 
+  start(data) {
     let database = new Indental(data).parse();
     let keys = Object.keys(database);
 
