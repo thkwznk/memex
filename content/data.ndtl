@@ -3481,7 +3481,7 @@ MOON PRECESSION
   TYPE : image
   TAGS : inspiration, moon, celest, nature, photography
   AUTH : Giorgia Hofer
-  LINK : www.giorgiahoferphotography.com
+  LINK : https://www.giorgiahoferphotography.com
   FILE : 12018-09-26_moonPrecession.jpg
 
 GOLDEN ALPINE LAKE
@@ -4249,8 +4249,9 @@ JS PROMISE INTRO
   TYPE : article
   PROJ : Memex, web
   TAGS : code, web, javascript
-  LINK : > https://medium.com/quick-code/javascript-promises-in-twenty-minutes-3aac5b65b887
-    >https://developers.google.com/web/fundamentals/primers/promises#whats-all-the-fuss-about
+  LINK :
+    > https://medium.com/quick-code/javascript-promises-in-twenty-minutes-3aac5b65b887
+    > https://developers.google.com/web/fundamentals/primers/promises#whats-all-the-fuss-about
   NOTE 
     > Simplified async function chaining (and error handling)
     > "A promise represents the eventual result of an asynchronous operation. The primary way of interaction with a promise is through its then method, which registers callbacks to receive either a promise’s eventual value or the reason why the promise cannot be fulfilled."
@@ -4612,7 +4613,7 @@ DOVE MAGE
   LINK : https://twitter.com/komiya_ma/status/1059456425603158016
   FILE : 12018-11-06_komiyaMa.png
   AUTH : Komiya Ma
-  TYPE : image
+  TYPE : quote
   TAGS : inspiration, bnw, bird
 
   AUTH : brennan
