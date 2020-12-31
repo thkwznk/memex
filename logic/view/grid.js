@@ -19,19 +19,37 @@ function createElement(elementTag, options = {}, ...children) {
   return element;
 }
 
-const Icon = (type, label, altClass) =>
+const Icon = ({ type, className = "article-icon" }) =>
   createElement("i", {
-    title: label || type || undefined,
-    className: [Icons[type], "textIcon", altClass || "article-icon"].join(" "),
+    title: type,
+    className: [Icons[type], "textIcon", className].join(" "),
   });
 
-const Row = ({ className, type }, ...children) =>
-  createElement(
-    "div",
+const Row = ({ className = "", type }, ...children) =>
+  Container(
     { className: `article-row ${className}` },
-    type && Icon(type),
+    type && Icon({ type }),
     createElement("div", { className: "article-rowtext" }, ...children)
   );
+
+const RowArray = ({ type, values, query, properCase }) => {
+  values = values
+    .map((value) => [
+      Anchor(
+        {
+          className: "article-taglink",
+          href: `#${query}-${value}`,
+        },
+        properCase ? Util.toProperCase(value) : value
+      ),
+      ", ",
+    ])
+    .flat();
+
+  values.pop(); // Remove the last comma
+
+  return Row({ type }, values);
+};
 
 const MultilineRow = ({ type, values }) =>
   Array.isArray(values)
@@ -73,9 +91,8 @@ const Container = (options, ...children) =>
   createElement("div", options, ...children);
 
 class Grid {
-  constructor({ container, overlay, numberOfColumns = 3 }) {
+  constructor({ container, numberOfColumns = 3 }) {
     this.container = container;
-    this.overlay = overlay;
     this.columns = [];
 
     for (let i = 0; i < numberOfColumns; i++) {
@@ -157,7 +174,21 @@ class Grid {
       SETTINGS.SHOWLINK && value.LINK && typeof value.LINK !== "object";
     let links = Array.isArray(value.LINK) ? value.LINK : [value.LINK];
     let done = value.DONE || "false";
-    let idUrl = value.SEEN && value.SEEN === "true" ? "urlseen" : "url";
+
+    const ArticleLink = (options, ...children) =>
+      Anchor(
+        {
+          ...options,
+          className: "article-link",
+        },
+        ...children
+      );
+
+    const IconLink = ({ type, ...options }) =>
+      Anchor(
+        { ...options, className: "article-type" },
+        Icon({ type, className: "article-typeicon" })
+      );
 
     const Header = () =>
       Container(
@@ -166,26 +197,32 @@ class Grid {
           onclick,
         },
         SETTINGS.SHOWTITLE &&
-          createElement("header", {
-            className: "article-title",
-            innerText: Util.toProperCase(key),
-          }),
+          createElement(
+            "header",
+            {
+              className: "article-title",
+            },
+            Util.toProperCase(key)
+          ),
         SETTINGS.SHOWLINK &&
           value.LINK &&
           links.map((link) =>
-            Anchor(
+            ArticleLink(
               {
-                className: "article-link",
                 href: String(link),
-                id: idUrl,
               },
               Container(
                 { className: "article-linkcontainer" },
-                Container({ className: "article-linkicon" }, Icon("link")),
-                Container({
-                  className: "article-linktitle",
-                  innerText: new URL(link).hostname,
-                })
+                Container(
+                  { className: "article-linkicon" },
+                  Icon({ type: "link" })
+                ),
+                Container(
+                  {
+                    className: "article-linktitle",
+                  },
+                  new URL(link).hostname
+                )
               )
             )
           ),
@@ -195,26 +232,17 @@ class Grid {
             SETTINGS.SHOWTYPE &&
               value.TYPE &&
               value.TYPE.map((type) =>
-                Anchor(
-                  { className: "article-type", href: `#type-${type}` },
-                  Icon(type, type, "article-typeicon")
-                )
+                IconLink({ type, href: `#type-${type}` })
               ),
-            SETTINGS.SHOWDONE &&
-              Anchor(
-                { className: "article-type", href: `#done-${done}` },
-                Icon(done, done, "article-typeicon")
-              )
+            SETTINGS.SHOWDONE && IconLink({ type: done, href: `#done-${done}` })
           )
       );
 
     // If this item has only one link then make the whole title the link
     return hasSingleLink
-      ? Anchor(
+      ? ArticleLink(
           {
-            className: "article-link",
             href: String(value.LINK),
-            id: idUrl,
           },
           Header()
         )
@@ -226,31 +254,45 @@ class Grid {
 
     let files = Array.isArray(value.FILE) ? value.FILE : [value.FILE];
 
+    const showDate = SETTINGS.SHOWDATE && value.DATE;
+    const showAuthor = SETTINGS.SHOWAUTH && value.AUTH;
+    const showTags = SETTINGS.SHOWTAGS && value.TAGS;
+    const showProjects = SETTINGS.SHOWPROJ && value.PROJ;
+    const showImage = // IMAGE - for non-image-type-article
+      SETTINGS.SHOWIMAG &&
+      !Util.isType(value.TYPE, "image") &&
+      value.FILE &&
+      Util.isImage(value.FILE);
+    const showFile = SETTINGS.SHOWFILE && value.FILE;
+
     return Container(
-      {
-        className: isImageType
-          ? "article-containerlower-image"
-          : "article-containerlower",
-        onclick: isImageType && this.handleOnClick(value.FILE),
-      },
-      SETTINGS.SHOWDATE && value.DATE && Row({ type: "date" }, value.DATE),
-      SETTINGS.SHOWAUTH &&
-        value.AUTH &&
+      isImageType
+        ? {
+            className: "article-containerlower-image",
+            onclick: this.handleOnClick(value.FILE),
+          }
+        : { className: "article-containerlower" },
+      showDate && Row({ type: "date" }, value.DATE),
+      showAuthor &&
         value.AUTH.map((author) =>
           Row({ type: "author" }, Util.toProperCase(author))
         ),
-      SETTINGS.SHOWTAGS &&
-        value.TAGS &&
-        this.doRowArray("tags", value.TAGS, "tag", false),
-      SETTINGS.SHOWPROJ &&
-        value.PROJ &&
-        this.doRowArray("project", value.PROJ, "proj", true),
+      showTags &&
+        RowArray({
+          type: "tags",
+          values: value.TAGS,
+          query: "tag",
+          properCase: false,
+        }),
+      showProjects &&
+        RowArray({
+          type: "project",
+          values: value.PROJ,
+          query: "proj",
+          properCase: true,
+        }),
       !isImageType && this.doBelow(value),
-      // IMAGE - for non-image-type-article
-      SETTINGS.SHOWIMAG &&
-        !Util.isType(value.TYPE, "image") &&
-        value.FILE &&
-        Util.isImage(value.FILE) &&
+      showImage &&
         Container(
           { className: "image" },
           createElement("img", {
@@ -259,8 +301,7 @@ class Grid {
             onclick: this.handleOnClick(value.FILE),
           })
         ),
-      SETTINGS.SHOWFILE &&
-        value.FILE &&
+      showFile &&
         files.map((file) =>
           Row(
             { type: "file", className: "article-file" },
@@ -291,23 +332,6 @@ class Grid {
         value.PROG &&
         MultilineRow({ type: "progress", values: value.PROG }),
     ];
-  }
-
-  doRowArray(type, data, query, propercase) {
-    let values = data
-      .map((value) => [
-        Anchor({
-          className: "article-taglink",
-          href: `#${query}-${value}`,
-          innerText: propercase ? Util.toProperCase(value) : value,
-        }),
-        ", ",
-      ])
-      .flat();
-
-    values.pop(); // Remove the last comma
-
-    return Row({ type }, values);
   }
 
   handleOnClick(file) {

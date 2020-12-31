@@ -12,7 +12,6 @@ class Main {
 
     this.grid = new Grid({
       container: document.querySelector("main"),
-      overlay: document.querySelector(".page-overlay"),
       numberOfColumns: 4,
     });
 
