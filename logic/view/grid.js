@@ -1,23 +1,4 @@
-function createElement(elementTag, options = {}, ...children) {
-  const element = document.createElement(elementTag);
-
-  for (let option in options) {
-    if (element[option] !== undefined) element[option] = options[option];
-    else element.setAttribute(option, options[option]);
-  }
-
-  for (let child of children.flat(2)) {
-    if (!child) continue;
-
-    element.appendChild(
-      typeof child === "string"
-        ? createElement("span", { innerText: child })
-        : child
-    );
-  }
-
-  return element;
-}
+// requires ./components.js
 
 const Icon = ({ type, className = "article-icon" }) =>
   createElement("i", {
@@ -83,12 +64,6 @@ function MultilineRowLine(type, value) {
   // Handle unformatted
   return Row({ type }, value);
 }
-
-const Anchor = (options, ...children) =>
-  createElement("a", options, ...children);
-
-const Container = (options, ...children) =>
-  createElement("div", options, ...children);
 
 class Grid {
   constructor({ container, numberOfColumns = 3 }) {
