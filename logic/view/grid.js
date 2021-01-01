@@ -84,8 +84,25 @@ class Grid {
   display(articles) {
     this.clear();
 
+    let columnSkip = new Array(this.columns.length);
+
+    for (let i = 0; i < columnSkip.length; i++) {
+      columnSkip[i] = 0;
+    }
+
     for (let i = 0; i < articles.length; i++) {
-      this.columns[i % this.columns.length].appendChild(articles[i]);
+      let columnIndex = i % this.columns.length;
+
+      if (columnSkip[columnIndex]) {
+        columnSkip[columnIndex]--;
+        continue;
+      }
+
+      this.columns[columnIndex].appendChild(articles[i]);
+
+      let height = articles[i].getAttribute("height");
+
+      if (height) columnSkip[columnIndex] += height;
     }
 
     seer.note("render html");
@@ -107,6 +124,7 @@ class Grid {
       {
         className: "article",
         id: SETTINGS.ARTICLEIDBASE + value.DIID,
+        height: value.HEIGHT,
       },
       SETTINGS.SHOWUPPER &&
         this.doUpper({
