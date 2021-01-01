@@ -2,6 +2,8 @@ function createElement(elementTag, options = {}, ...children) {
   const element = document.createElement(elementTag);
 
   for (let option in options) {
+    if (options[option] === undefined) continue;
+
     if (element[option] !== undefined) element[option] = options[option];
     else element.setAttribute(option, options[option]);
   }
