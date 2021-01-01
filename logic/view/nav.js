@@ -1,82 +1,102 @@
+// requires ./components.js
+
+const NavGroup = (...items) =>
+  Container(
+    { className: "nav-itemgroup" },
+    ...items.map((item) =>
+      Anchor(
+        { className: "nav-item", href: item.href },
+        Container({ className: "nav-itemcount" }, item.count),
+        createElement("i", {
+          title: item.title,
+          className: `nav-itemicon ${item.className}`,
+        })
+      )
+    )
+  );
+
 class Nav {
   constructor({ container }) {
     this.container = container;
   }
 
   display(stats) {
-    let navContent = ``;
+    this.container.innerHTML = "";
 
-    // TOTAL
-    navContent += `
-      <div class="nav-itemgroup">
-        <a href='#' class="nav-item">
-          <div class="nav-itemcount">${stats.total}</div>
-          <i title="all" class="nav-itemicon fas fa-asterisk"></i>
-        </a>
-      </div>`;
+    this.container.appendChild(
+      NavGroup({
+        href: "#",
+        count: stats.total,
+        title: "all",
+        className: "fas fa-asterisk",
+      })
+    );
 
-    // DONE
     if (SETTINGS.SHOWDONE) {
-      navContent += `
-        <div class="nav-itemgroup">
-          <a href='#done-true' class="nav-item">
-            <div class="nav-itemcount">${stats.done}</div>
-            <i title="done" class="nav-itemicon ${Icons["true"]}"></i>
-          </a>
-          <a href='#done-false' class="nav-item">
-            <div class="nav-itemcount">${stats.total - stats.done}</div>
-            <i title="to do" class="nav-itemicon ${Icons["false"]}"></i>
-          </a>
-        </div>`;
+      this.container.appendChild(
+        NavGroup(
+          {
+            href: "#done-true",
+            count: stats.done,
+            title: "done",
+            className: Icons["true"],
+          },
+          {
+            href: "#done-false",
+            count: stats.total - stats.done,
+            title: "to do",
+            className: Icons["false"],
+          }
+        )
+      );
     }
 
-    // TYPES
     const types = stats.getSortedTypes(SETTINGS.STATSNUMTYPE);
 
-    navContent += `<div class="nav-itemgroup">`;
-    navContent += types
-      .map(
-        (type) =>
-          `<a href='#type-${type.name}' class="nav-item">
-            <div class="nav-itemcount">${type.count}</div>
-            <i title="${type.name}"
-               class="nav-itemicon ${Icons[type.name]}"></i>
-          </a>`
+    this.container.appendChild(
+      NavGroup(
+        ...types.map((type) => ({
+          href: `#type-${type.name}`,
+          count: type.count,
+          title: type.name,
+          className: Icons[type.name],
+        }))
       )
-      .join("");
-    navContent += `</div>`;
+    );
 
-    // TERM
-    navContent += `<div class="nav-itemgroup">`;
-    if (stats.terms > 0) {
-      navContent += `
-        <a href='#term' class="nav-item">
-          <div class="nav-itemcount">${stats.terms}</div>
-          <i title="terms" class="nav-itemicon fas fa-ribbon"></i>
-        </a>`;
+    if (stats.terms) {
+      this.container.appendChild(
+        NavGroup({
+          href: "#term",
+          count: stats.terms,
+          title: "terms",
+          className: "fas fa-ribbon",
+        })
+      );
     }
-    navContent += `</div>`;
 
-    // TAGS
     const tags = stats.getSortedTags(SETTINGS.STATSNUMTAGS);
 
-    navContent += `<div class="nav-itemgroup">`;
     if (tags) {
-      navContent += `<div class="nav-tagcontainer">`;
-      navContent += `<i title="tags" class="nav-tagicon fas fa-tag"></i>`;
-      navContent += tags
-        .map(
-          (tag) =>
-            `<a class="nav-tag" href='#tag-${tag.name}'>
-              <div class="nav-tagcount">${tag.count}</div>
-              <div class="nav-taglabel">${tag.name}</div>
-            </a>`
+      this.container.appendChild(
+        Container(
+          { className: "nav-itemgroup" },
+          Container(
+            { className: "nav-tagcontainer" },
+            createElement("i", {
+              title: "tags",
+              className: "nav-tagicon fas fa-tag",
+            }),
+            tags.map((tag) =>
+              Anchor(
+                { className: "nav-tag", href: `tag-${tag.name}` },
+                Container({ className: "nav-tagcount" }, tag.count),
+                Container({ className: "nav-taglabel" }, tag.name)
+              )
+            )
+          )
         )
-        .join("");
-      navContent += `</div>`;
+      );
     }
-    navContent += `</div>`;
-
-    this.container.innerHTML = navContent;
   }
 }
