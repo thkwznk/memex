@@ -261,6 +261,13 @@ nav::-webkit-scrollbar {
   background: var(--background);
   margin-left: calc(var(--size-menu) + var(--size-grid-gutter));
   margin-right: var(--size-grid-gutter);
+  background: repeating-linear-gradient(
+    45deg,
+    #333,
+    #333 20px,
+    #222 20px,
+    #222 40px
+  ); /* User colors from variables */
 }
 main {
   margin: var(--size-grid-gutter) auto;
@@ -289,6 +296,7 @@ main:after {
   position: relative;
   float: left;
   overflow: hidden;
+  outline: 20px #222 solid; /* Use color from a variable */
 }
 @media screen and (min-width: 886px) {
   .article-wide {
@@ -730,6 +738,35 @@ article:hover .textIcon {
 }
 
 .column {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  flex-wrap: wrap;
+}
+
+.column:last-child {
+  margin-right: 0;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+}
+
+.subcolumn .article {
+  margin-top: 0;
+}
+
+.subcolumn:first-child {
+  margin-right: 10px;
+}
+
+.subcolumn:last-child {
+  margin-left: 10px;
+}
+
+.subcolumn {
   display: flex;
   flex-direction: column;
   flex: 1;

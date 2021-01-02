@@ -66,15 +66,45 @@ function MultilineRowLine(type, value) {
 }
 
 class Grid {
-  constructor({ container, numberOfColumns = 3 }) {
-    this.container = container;
-    this.columns = [];
+  NUMBER_OF_COLUMNS = 2;
+  NUMBER_OF_SUBCOLUMNS = 2;
 
-    for (let i = 0; i < numberOfColumns; i++) {
-      let column = createElement("div", { className: "column" });
-      this.container.appendChild(column);
+  constructor({ container }) {
+    this.container = container;
+    this.columns = new Array();
+
+    for (let i = 0; i < this.NUMBER_OF_COLUMNS; i++) {
+      let column = Container({ className: "column" });
       this.columns.push(column);
+      this.container.appendChild(column);
     }
+  }
+
+  insert(subcolumnIndex, element) {
+    const columnIndex = Math.floor(subcolumnIndex / this.NUMBER_OF_COLUMNS);
+    const column = this.columns[columnIndex];
+    const isWide = element.wide || element.getAttribute("wide");
+
+    if (isWide) {
+      column.appendChild(element);
+      return;
+    }
+
+    const hasSubcolumns =
+      column.lastChild && column.lastChild.tagName === "DIV";
+
+    if (!hasSubcolumns) {
+      let row = Container({ className: "row" });
+
+      for (let i = 0; i < this.NUMBER_OF_SUBCOLUMNS; i++)
+        row.appendChild(Container({ className: "subcolumn" }));
+
+      column.appendChild(row);
+    }
+
+    column.lastChild.children[
+      subcolumnIndex - columnIndex * this.NUMBER_OF_SUBCOLUMNS
+    ].appendChild(element);
   }
 
   clear() {
@@ -84,25 +114,32 @@ class Grid {
   display(articles) {
     this.clear();
 
-    let columnSkip = new Array(this.columns.length);
+    let subcolumnsTotal = this.NUMBER_OF_SUBCOLUMNS * this.NUMBER_OF_COLUMNS;
+
+    let columnSkip = new Array(subcolumnsTotal);
 
     for (let i = 0; i < columnSkip.length; i++) {
       columnSkip[i] = 0;
     }
 
-    for (const [index, article] of articles.entries()) {
-      let columnIndex = index % this.columns.length;
+    let index = 0;
 
-      if (columnSkip[columnIndex]) {
-        columnSkip[columnIndex]--;
-        continue;
+    for (const article of articles) {
+      let subcolumnIndex = index % subcolumnsTotal;
+
+      while (columnSkip[subcolumnIndex] > 0) {
+        columnSkip[subcolumnIndex]--;
+        index++;
+        subcolumnIndex = index % subcolumnsTotal;
       }
 
-      this.columns[columnIndex].appendChild(article);
+      this.insert(subcolumnIndex, article);
 
       let height = article.getAttribute("height");
 
-      if (height) columnSkip[columnIndex] += height;
+      if (height) columnSkip[subcolumnIndex] += height;
+
+      index++;
     }
 
     seer.note("render html");
@@ -125,6 +162,7 @@ class Grid {
         className: "article",
         id: SETTINGS.ARTICLEIDBASE + value.DIID,
         height: value.HEIGHT,
+        wide: value.WIDE,
       },
       SETTINGS.SHOWUPPER &&
         this.doUpper({
