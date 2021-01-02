@@ -90,17 +90,17 @@ class Grid {
       columnSkip[i] = 0;
     }
 
-    for (let i = 0; i < articles.length; i++) {
-      let columnIndex = i % this.columns.length;
+    for (const [index, article] of articles.entries()) {
+      let columnIndex = index % this.columns.length;
 
       if (columnSkip[columnIndex]) {
         columnSkip[columnIndex]--;
         continue;
       }
 
-      this.columns[columnIndex].appendChild(articles[i]);
+      this.columns[columnIndex].appendChild(article);
 
-      let height = articles[i].getAttribute("height");
+      let height = article.getAttribute("height");
 
       if (height) columnSkip[columnIndex] += height;
     }
