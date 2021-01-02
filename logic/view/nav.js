@@ -89,7 +89,7 @@ class Nav {
             }),
             tags.map((tag) =>
               Anchor(
-                { className: "nav-tag", href: `tag-${tag.name}` },
+                { className: "nav-tag", href: `#tag-${tag.name}` },
                 Container({ className: "nav-tagcount" }, tag.count),
                 Container({ className: "nav-taglabel" }, tag.name)
               )
