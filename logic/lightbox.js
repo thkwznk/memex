@@ -1,15 +1,19 @@
+// requires ./view/components.js
+
 class Lightbox {
   constructor({ container, classNamePrefix }) {
     this.container = container;
 
-    let back = document.createElement("div");
-    back.className = `${classNamePrefix}-back`;
-    this.addEvent(back, "click", () => this.close());
+    let back = Container({
+      className: `${classNamePrefix}-back`,
+      onclick: () => this.close(),
+    });
     this.container.appendChild(back);
 
-    this.img = document.createElement("img");
-    this.img.className = `${classNamePrefix}-img`;
-    this.addEvent(this.img, "click", () => this.close());
+    this.img = createElement("img", {
+      className: `${classNamePrefix}-img`,
+      onclick: () => this.close(),
+    });
 
     this.container.appendChild(this.img);
   }
@@ -21,13 +25,5 @@ class Lightbox {
 
   close() {
     this.container.style.display = "none";
-  }
-
-  addEvent(element, eventName, func) {
-    if (element.attachEvent) {
-      return element.attachEvent("on" + eventName, func);
-    }
-
-    return element.addEventListener(eventName, func, false);
   }
 }
