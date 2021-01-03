@@ -83,7 +83,7 @@ class Grid {
   insert(subcolumnIndex, element) {
     const columnIndex = Math.floor(subcolumnIndex / this.NUMBER_OF_COLUMNS);
     const column = this.columns[columnIndex];
-    const isWide = element.wide || element.getAttribute("wide");
+    const isWide = element.wide || element.getAttribute("wide") === "true";
 
     if (isWide) {
       column.appendChild(element);
@@ -161,6 +161,12 @@ class Grid {
       {
         className: "article",
         id: SETTINGS.ARTICLEIDBASE + value.DIID,
+        height: value.HEIGHT,
+        wide:
+          value.WIDE ||
+          (value.QOTE &&
+            Array.isArray(value.QOTE) &&
+            value.QOTE.length > SETTINGS.AUTOWIDETRIGGER),
         term: value.TERM,
         tags: value.TAGS,
         proj: value.PROJ,
