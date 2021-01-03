@@ -168,6 +168,8 @@ nav {
   z-index: 100;
   left: 0px;
   top: 0px;
+  display: flex;
+  flex-direction: column;
   /*overflow-y: scroll;*/ /*allow menu to scroll on small screens*/
 }
 nav:hover {
@@ -178,8 +180,8 @@ nav::-webkit-scrollbar {
 }
 .nav-itemgroup {
   padding-bottom: var(--size-menu-itemgroup-sepv);
-  width: 100%;
-  float: left;
+  display: flex;
+  flex-direction: column;
 }
 .nav-item {
   padding-bottom: calc(var(--size-menu-item-sepv) / 2);
@@ -187,10 +189,8 @@ nav::-webkit-scrollbar {
   font-size: var(--size-font-menutypes);
   opacity: var(--alpha-idle);
   color: var(--color-menu);
-  text-align: center;
-  margin: 0px auto;
-  width: 100%;
-  float: left;
+  display: flex;
+  text-decoration: none;
 }
 .nav-item:hover {
   color: var(--color-menuascent);
@@ -198,22 +198,19 @@ nav::-webkit-scrollbar {
 }
 .nav-itemcount {
   padding-right: calc(var(--size-menu-item-seph) / 2);
-  display: inline-block;
-  text-align: right;
-  float: left;
   width: 50%;
+  text-align: right;
 }
 .nav-itemicon {
-  margin-left: calc(var(--size-menu-item-seph) / 2);
-  margin-top: calc(var(--size-font-bodytypes) / 10);
-  width: calc(var(--size-font-bodytypes) * 1.25);
-  display: inline-block;
+  padding-left: calc(var(--size-menu-item-seph) / 2);
+  width: calc(var(--size-font-bodytypes) * 1.5);
   text-align: center;
-  float: left;
+  margin-top: 0.1em;
 }
 .nav-tagcontainer {
   margin: 0 auto;
-  display: table;
+  display: flex;
+  flex-direction: column;
 }
 .nav-tagicon {
   padding-bottom: calc(var(--size-menu-item-sepv) / 2);
@@ -221,10 +218,8 @@ nav::-webkit-scrollbar {
   font-size: var(--size-font-menutags);
   opacity: var(--alpha-idle);
   color: var(--color-menu);
-  display: table-row;
   text-align: center;
   width: 100%;
-  float: left;
 }
 .nav-tag {
   padding-bottom: calc(var(--size-menu-tag-sepv) / 2);
@@ -233,17 +228,15 @@ nav::-webkit-scrollbar {
   opacity: var(--alpha-idle);
   color: var(--color-menu);
   width: 100%;
-  float: left;
-  clear: left;
 }
 .nav-tagcount {
   padding-right: var(--size-menu-tag-sepv);
   text-align: right;
-  float: left;
+  display: inline-block;
 }
 .nav-taglabel {
   text-align: left;
-  float: left;
+  display: inline-block;
 }
 .nav-tag:hover {
   opacity: var(--alpha-ascent);
