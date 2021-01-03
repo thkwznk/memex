@@ -282,22 +282,16 @@ main:after {
 }
 
 /* GRID ITEM */
-.article,
-.article-wide {
+.article {
   border-radius: var(--size-item-corner);
   margin-bottom: var(--size-grid-gutter);
   background: var(--color-itembg);
   text-decoration: none;
   position: relative;
-  float: left;
   overflow: hidden;
   outline: 20px #222 solid; /* Use color from a variable */
 }
-@media screen and (min-width: 886px) {
-  .article-wide {
-    width: calc(var(--size-grid-column) * 2 + var(--size-grid-gutter));
-  }
-}
+
 article:hover {
   background: var(--color-itembg);
 }
@@ -413,8 +407,6 @@ article:hover .article-containerlower-image {
   color: var(--color-item);
   font-size: var(--size-font-title);
   text-decoration: none;
-  float: left;
-  clear: both;
 }
 .article-image .article-title {
   display: none;
@@ -428,13 +420,9 @@ article:hover .article-containerlower-image {
 /* LINK */
 .article-linkcontainer {
   margin-top: var(--size-item-elem-padding);
-  float: left;
-  clear: both;
 }
 .article-link {
   width: calc(100% - var(--size-font-bodytypes) * 2);
-  float: left;
-  clear: both;
   text-decoration: none;
   display: inline-block;
 }
@@ -443,7 +431,7 @@ article:hover .article-containerlower-image {
   opacity: var(--alpha-idle);
   color: var(--color-item);
   font-size: var(--size-font-body);
-  float: left;
+  display: inline-block;
 }
 .article-link:hover .article-linktitle {
   background-color: var(--color-itemascent);
@@ -453,7 +441,7 @@ article:hover .article-containerlower-image {
   width: 23px;
   font-size: 15px;
   color: var(--color-item);
-  float: left;
+  display: inline-block;
 }
 article:hover .article-linktitle {
   opacity: var(--alpha-enabled);
@@ -502,7 +490,6 @@ article:hover .article-typeicon {
 
 /* DATE, NOTE, QUOTE, TERM, TAGS, AUTH, PROG etc */
 .article-icon {
-  float: left;
   opacity: var(--alpha-idleicon);
 }
 article:hover .article-icon {
@@ -512,8 +499,6 @@ article:hover .article-icon {
   padding-top: var(--size-item-elem-padding);
   color: var(--color-item);
   font-size: var(--size-font-body);
-  float: left;
-  clear: both;
   cursor: default;
 }
 article:hover .article-row {
