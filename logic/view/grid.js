@@ -159,7 +159,7 @@ class Grid {
     return createElement(
       "article",
       {
-        className: "article",
+        className: `article ${isImageType ? "article-image" : ""}`,
         id: SETTINGS.ARTICLEIDBASE + value.DIID,
         height: value.HEIGHT,
         wide:

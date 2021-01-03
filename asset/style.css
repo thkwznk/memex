@@ -355,13 +355,13 @@ article:hover .article-containerlower-image {
   display: none;
 }
 
-.article-image {
-  position: absolute;
-  top: 0;
-  background: transparent;
-  padding-bottom: 0;
-  overflow: hidden;
+.article-image .article-link {
+  display: none;
 }
+.article-image:hover .article-link {
+  display: initial;
+}
+
 .article-image-img {
   vertical-align: middle; /* vertical-align css hack removes bottom padding */
   object-fit: cover;
@@ -393,13 +393,6 @@ article:hover .article-containerlower-image {
 }
 .article:hover .image-overlay {
   opacity: var(--alpha-darken);
-}
-.article-image .article-link {
-  display: none;
-}
-.article-image:hover .article-link {
-  display: initial;
-  text-shadow: 0 0 3em #000;
 }
 
 /* TITLE */
