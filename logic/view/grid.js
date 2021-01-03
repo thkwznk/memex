@@ -190,7 +190,7 @@ class Grid {
             className: "image-overlay",
             onclick: this.handleOnClick(value.FILE),
           }),
-        createElement("img", {
+        Img({
           className: "article-image-img",
           src: `content/media/${value.FILE}`,
         }),
@@ -326,7 +326,7 @@ class Grid {
       showImage &&
         Container(
           { className: "image" },
-          createElement("img", {
+          Img({
             className: "article-img",
             src: `content/media/${value.FILE}`,
             onclick: this.handleOnClick(value.FILE),

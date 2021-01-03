@@ -26,3 +26,6 @@ const Anchor = (options, ...children) =>
 
 const Container = (options, ...children) =>
   createElement("div", options, ...children);
+
+const Img = (options, ...children) =>
+  createElement("img", options, ...children);

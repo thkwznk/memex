@@ -10,7 +10,7 @@ class Lightbox {
     });
     this.container.appendChild(back);
 
-    this.img = createElement("img", {
+    this.img = Img({
       className: `${classNamePrefix}-img`,
       onclick: () => this.close(),
     });
