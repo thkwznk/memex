@@ -23,10 +23,13 @@ class Main {
   }
 
   start() {
-    this.articles = this.wrap.start(DATABASE);
+    this.db = this.wrap.start(DATABASE);
     seer.note("process db");
 
-    let stats = this.wrap.stats(this.articles);
+    this.articles = this.grid.buildAllArticles(this.db);
+    seer.note("build html");
+
+    let stats = this.wrap.stats(this.db);
     seer.note("calc stats");
 
     this.nav.display(stats);
@@ -40,29 +43,14 @@ class Main {
     lightbox.close();
     document.activeElement.blur();
 
-    // UPDATE QUERY
-    let target = window.document.location.hash;
-
-    target =
-      target.substr(0, 1) === "#"
-        ? target.substr(1, target.length - 1)
-        : target;
-
-    let queryCurrent = target.trim();
-
-    if (window.location.hash != queryCurrent) {
-      window.location.hash = queryCurrent;
-    }
-
     // DISPLAY
-    let filtered = this.wrap.filter(queryCurrent, this.articles);
-    let filteredLength = Object.keys(filtered).length;
+    let filtered = this.filter(this.getTarget(), this.articles);
     seer.note("filter db");
 
     let delay = 0;
 
     if (
-      filteredLength > SETTINGS.LOADANIMNUM ||
+      filtered.length > SETTINGS.LOADANIMNUM ||
       this.articlesDisplayed > SETTINGS.LOADANIMNUM
     ) {
       // adding or removing a large number of articles can take time, so show loader
@@ -70,20 +58,39 @@ class Main {
       document.querySelector(".loading-wave").style.display = "inline-block";
       delay = 10; // Small delay gives the preloader time to display
     }
-    this.articlesDisplayed = filteredLength;
 
-    setTimeout(() => this.build(filtered), delay);
-  }
+    this.articlesDisplayed = filtered.length;
 
-  build(filtered) {
-    let articles = this.grid.buildAllArticles(filtered);
-
-    seer.note("build html");
-
-    this.grid.display(articles);
+    this.grid.display(filtered);
     seer.report();
 
     document.querySelector(".loading-wave").style.display = "none";
+  }
+
+  getTarget() {
+    let target = document.location.hash;
+    target = target.substr(0, 1) === "#" ? target.substr(1) : target;
+    return target.trim();
+  }
+
+  filter(target, articles) {
+    if (!target) return articles;
+
+    if (target === "term") {
+      return articles.filter((article) => article.getAttribute(target));
+    }
+
+    var splitTarget = target.split("-");
+    let targetType = splitTarget[0];
+    let targetName = decodeURI(splitTarget[1]);
+
+    if (targetType == "tag") targetType = "tags";
+
+    return articles.filter((article) => {
+      const attribute = article.getAttribute(targetType);
+
+      return attribute && attribute.includes(targetName);
+    });
   }
 }
 

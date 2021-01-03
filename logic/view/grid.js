@@ -161,8 +161,11 @@ class Grid {
       {
         className: "article",
         id: SETTINGS.ARTICLEIDBASE + value.DIID,
-        height: value.HEIGHT,
-        wide: value.WIDE,
+        term: value.TERM,
+        tags: value.TAGS,
+        proj: value.PROJ,
+        type: value.TYPE,
+        done: value.DONE,
       },
       SETTINGS.SHOWUPPER &&
         this.doUpper({
