@@ -65,6 +65,51 @@ function MultilineRowLine(type, value) {
   return Row({ type }, value);
 }
 
+// Components
+
+const Authors = ({ values }) =>
+  values.map((author) => Row({ type: "author" }, Util.toProperCase(author)));
+
+const Tags = ({ values }) =>
+  RowArray({
+    type: "tags",
+    values,
+    query: "tag",
+    properCase: false,
+  });
+
+const Projects = ({ values }) =>
+  RowArray({
+    type: "project",
+    values,
+    query: "proj",
+    properCase: true,
+  });
+
+const ArticleImage = ({ src, onclick }) =>
+  Container(
+    { className: "image" },
+    Img({
+      className: "article-img",
+      src,
+      onclick,
+    })
+  );
+
+const Files = ({ directory, values }) =>
+  values.map((fileName) =>
+    Row(
+      { type: "file", className: "article-file" },
+      Anchor(
+        {
+          className: "article-file-link",
+          href: `${directory}${fileName}`,
+        },
+        fileName
+      )
+    )
+  );
+
 class Grid {
   NUMBER_OF_COLUMNS = 2;
   NUMBER_OF_SUBCOLUMNS = 2;
@@ -294,16 +339,11 @@ class Grid {
 
     let files = Array.isArray(value.FILE) ? value.FILE : [value.FILE];
 
-    const showDate = SETTINGS.SHOWDATE && value.DATE;
-    const showAuthor = SETTINGS.SHOWAUTH && value.AUTH;
-    const showTags = SETTINGS.SHOWTAGS && value.TAGS;
-    const showProjects = SETTINGS.SHOWPROJ && value.PROJ;
     const showImage = // IMAGE - for non-image-type-article
       SETTINGS.SHOWIMAG &&
       !Util.isType(value.TYPE, "image") &&
       value.FILE &&
       Util.isImage(value.FILE);
-    const showFile = SETTINGS.SHOWFILE && value.FILE;
 
     return Container(
       isImageType
@@ -312,48 +352,19 @@ class Grid {
             onclick: this.handleOnClick(value.FILE),
           }
         : { className: "article-containerlower" },
-      showDate && Row({ type: "date" }, value.DATE),
-      showAuthor &&
-        value.AUTH.map((author) =>
-          Row({ type: "author" }, Util.toProperCase(author))
-        ),
-      showTags &&
-        RowArray({
-          type: "tags",
-          values: value.TAGS,
-          query: "tag",
-          properCase: false,
-        }),
-      showProjects &&
-        RowArray({
-          type: "project",
-          values: value.PROJ,
-          query: "proj",
-          properCase: true,
-        }),
+      SETTINGS.SHOWDATE && value.DATE && Row({ type: "date" }, value.DATE),
+      SETTINGS.SHOWAUTH && value.AUTH && Authors({ values: value.AUTH }),
+      SETTINGS.SHOWTAGS && value.TAGS && Tags({ values: value.TAGS }),
+      SETTINGS.SHOWPROJ && value.PROJ && Projects({ values: value.PROJ }),
       !isImageType && this.doBelow(value),
       showImage &&
-        Container(
-          { className: "image" },
-          Img({
-            className: "article-img",
-            src: `content/media/${value.FILE}`,
-            onclick: this.handleOnClick(value.FILE),
-          })
-        ),
-      showFile &&
-        files.map((file) =>
-          Row(
-            { type: "file", className: "article-file" },
-            Anchor(
-              {
-                className: "article-file-link",
-                href: `content/media/${file}`,
-              },
-              file
-            )
-          )
-        )
+        ArticleImage({
+          src: `content/media/${value.FILE}`,
+          onclick: this.handleOnClick(value.FILE),
+        }),
+      SETTINGS.SHOWFILE &&
+        value.FILE &&
+        Files({ directory: "content/media/", values: files })
     );
   }
 
