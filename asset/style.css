@@ -596,7 +596,6 @@ article:hover .textIcon {
 .row {
   display: flex;
   flex-direction: row;
-  flex: 1;
 }
 
 .subcolumn .article {
