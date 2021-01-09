@@ -586,7 +586,6 @@ article:hover .textIcon {
   display: flex;
   flex-direction: column;
   flex: 1;
-  flex-wrap: wrap;
 }
 
 .column:last-child {
