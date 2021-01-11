@@ -156,38 +156,99 @@ class Grid {
     for (let column of this.columns) column.innerHTML = "";
   }
 
+  onImagesLoaded(func) {
+    let images = document.querySelectorAll("main img");
+
+    var imagesToLoad = images.length;
+
+    let handleOnLoad = () => {
+      imagesToLoad--;
+
+      if (imagesToLoad === 0) func();
+    };
+
+    images.forEach((image) => (image.onload = handleOnLoad));
+  }
+
+  balanceColumns() {
+    const addChildrenSumHeight = (element) => {
+      element.childrenSumHeight = -20;
+
+      for (let article of element.children)
+        element.childrenSumHeight += article.offsetHeight + 20;
+
+      return element;
+    };
+
+    const balance = (child) => {
+      let columns = Array.from(child.children).map((c) =>
+        addChildrenSumHeight(c)
+      );
+      columns.sort((ca, cb) => cb.childrenSumHeight - ca.childrenSumHeight);
+
+      const overcrowded = columns[0];
+      const notOvercrowded = columns[columns.length - 1];
+
+      let heightDiff = Math.abs(
+        overcrowded.childrenSumHeight - notOvercrowded.childrenSumHeight
+      );
+
+      while (true) {
+        if (heightDiff <= 0) break;
+
+        let overcrowdedChildren = Array.from(overcrowded.children);
+        overcrowdedChildren.sort(
+          (a, b) =>
+            Math.abs(heightDiff / 2 - a.offsetHeight) -
+            Math.abs(heightDiff / 2 - b.offsetHeight)
+        );
+        const closest = overcrowdedChildren[0];
+
+        if (closest.offsetHeight > heightDiff) break;
+
+        overcrowded.removeChild(closest);
+        notOvercrowded.appendChild(closest);
+
+        heightDiff -= closest.offsetHeight * 2 + 40;
+      }
+    };
+
+    for (let column of this.columns)
+      for (let child of column.children)
+        if (child.tagName === "DIV" && child.children.length === 2)
+          balance(child);
+  }
+
   display(articles) {
     this.clear();
 
     let subcolumnsTotal = this.NUMBER_OF_SUBCOLUMNS * this.NUMBER_OF_COLUMNS;
 
-    let columnSkip = new Array(subcolumnsTotal);
-
-    for (let i = 0; i < columnSkip.length; i++) {
-      columnSkip[i] = 0;
-    }
+    let subcolumnSkip = new Array(subcolumnsTotal).fill(0);
 
     let index = 0;
 
     for (const article of articles) {
       let subcolumnIndex = index % subcolumnsTotal;
 
-      while (columnSkip[subcolumnIndex] > 0) {
-        columnSkip[subcolumnIndex]--;
+      while (subcolumnSkip[subcolumnIndex] > 0) {
+        subcolumnSkip[subcolumnIndex]--;
         index++;
         subcolumnIndex = index % subcolumnsTotal;
       }
 
       this.insert(subcolumnIndex, article);
 
-      let height = article.getAttribute("height");
+      let heightUnits = article.getAttribute("height");
 
-      if (height) columnSkip[subcolumnIndex] += height;
+      if (heightUnits) subcolumnSkip[subcolumnIndex] += heightUnits;
 
       index++;
     }
 
     seer.note("render html");
+
+    this.onImagesLoaded(() => this.balanceColumns());
   }
 
   buildAllArticles(db) {
